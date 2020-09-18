@@ -1,0 +1,14 @@
+[gd_scene format=2]
+
+[node name="Title" type="Label"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -292.0
+margin_top = 368.0
+margin_right = 292.0
+margin_bottom = 425.0
+text = "Godot Platformer Game"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}

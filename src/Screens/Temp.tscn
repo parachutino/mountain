@@ -1,0 +1,77 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://assets/ui_theme.tres" type="Theme" id=1]
+[ext_resource path="res://src/UserInterface/Title.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/UserInterface/ChangeSceneButton.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/UserInterface/QuitButton.tscn" type="PackedScene" id=4]
+[ext_resource path="res://src/UserInterface/ChangeSceneButton.gd" type="Script" id=5]
+[ext_resource path="res://src/UserInterface/QuitButton.gd" type="Script" id=6]
+[ext_resource path="res://assets/background.png" type="Texture" id=7]
+
+[node name="EndScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Background" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menu" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -121.0
+margin_top = -81.0
+margin_right = 121.0
+margin_bottom = 85.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayButton" type="Button" parent="Menu" instance=ExtResource( 3 )]
+margin_right = 242.0
+margin_bottom = 81.0
+size_flags_vertical = 3
+text = "Play Again"
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+next_scene_path = "res://src/Screens/MainScreen.tscn"
+
+[node name="QuitButton" type="Button" parent="Menu" instance=ExtResource( 4 )]
+margin_top = 85.0
+margin_right = 242.0
+margin_bottom = 166.0
+size_flags_vertical = 3
+text = "Quit"
+script = ExtResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="." instance=ExtResource( 2 )]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -292.0
+margin_top = 368.0
+margin_right = 292.0
+margin_bottom = 425.0
+text = "Godot Platformer Game"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="button_up" from="Menu/PlayButton" to="Menu/PlayButton" method="_on_button_up"]
+[connection signal="button_up" from="Menu/QuitButton" to="Menu/QuitButton" method="_on_button_up"]
