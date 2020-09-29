@@ -20,12 +20,15 @@ __meta__ = {
 [node name="Label" type="Label" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -304.0
-margin_top = 72.0
-margin_right = -73.0
-margin_bottom = 129.0
+margin_left = -245.0
+margin_top = 17.0
+margin_right = -14.0
+margin_bottom = 74.0
 text = "Score: %s"
 align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="PauseOverlay" type="ColorRect" parent="."]
 visible = false
@@ -57,13 +60,13 @@ __meta__ = {
 }
 
 [node name="RetryButton" parent="PauseOverlay/VBoxContainer" instance=ExtResource( 5 )]
+margin_right = 304.0
+margin_bottom = 67.0
+
+[node name="ChangeSceneButton" parent="PauseOverlay/VBoxContainer" instance=ExtResource( 3 )]
 margin_top = 71.0
 margin_right = 304.0
 margin_bottom = 138.0
-
-[node name="ChangeSceneButton" parent="PauseOverlay/VBoxContainer" instance=ExtResource( 3 )]
-margin_right = 304.0
-margin_bottom = 67.0
 text = "Main Screen"
 next_scene_path = "res://src/Screens/MainScreen.tscn"
 

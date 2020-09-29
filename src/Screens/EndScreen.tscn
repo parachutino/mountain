@@ -5,8 +5,9 @@
 [ext_resource path="res://src/UserInterface/QuitButton.tscn" type="PackedScene" id=3]
 [ext_resource path="res://assets/font_default.tres" type="DynamicFont" id=4]
 [ext_resource path="res://src/Screens/EndScreen.gd" type="Script" id=5]
-[ext_resource path="res://assets/background.png" type="Texture" id=6]
+[ext_resource path="res://assets/background/background.png" type="Texture" id=6]
 [ext_resource path="res://src/UserInterface/Title.tscn" type="PackedScene" id=7]
+
 
 [node name="EndScreen" type="Control"]
 anchor_right = 1.0

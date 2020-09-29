@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/grass_tiles.png-3b2231442c5fa3cb8f9f7685db3122ab.stex"
+path="res://.import/background_glacial_mountains_lightened.png-866f408737ec7e94bc8adc53bd3cd1fc.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/grass_tiles.png"
-dest_files=[ "res://.import/grass_tiles.png-3b2231442c5fa3cb8f9f7685db3122ab.stex" ]
+source_file="res://assets/background/background_glacial_mountains_lightened.png"
+dest_files=[ "res://.import/background_glacial_mountains_lightened.png-866f408737ec7e94bc8adc53bd3cd1fc.stex" ]
 
 [params]
 
@@ -31,4 +31,4 @@ process/invert_color=false
 stream=false
 size_limit=0
 detect_3d=true
-svg/scale=4.0
+svg/scale=1.0

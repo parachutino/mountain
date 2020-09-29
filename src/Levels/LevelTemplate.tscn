@@ -1,10 +1,8 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://src/Actors/Player.tscn" type="PackedScene" id=1]
-[ext_resource path="res://assets/tileset.tres" type="TileSet" id=2]
-[ext_resource path="res://src/Actors/Enemy.tscn" type="PackedScene" id=3]
-[ext_resource path="res://assets/background.png" type="Texture" id=4]
-[ext_resource path="res://src/Objects/Coin.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/tiles/tileset.tres" type="TileSet" id=2]
+[ext_resource path="res://assets/background/background_glacial_mountains_lightened.png" type="Texture" id=4]
 [ext_resource path="res://src/Objects/Portal2D.tscn" type="PackedScene" id=6]
 [ext_resource path="res://src/Levels/Level_02.tscn" type="PackedScene" id=7]
 [ext_resource path="res://src/UserInterface/UserInterface.tscn" type="PackedScene" id=9]
@@ -25,55 +23,39 @@ layer = -100
 [node name="background" type="TextureRect" parent="CanvasLayer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = 1920.0
-margin_bottom = 1080.0
+margin_right = 0.00012207
 texture = ExtResource( 4 )
+expand = true
+stretch_mode = 5
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ParallaxBackground" type="ParallaxBackground" parent="CanvasLayer"]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="CanvasLayer/ParallaxBackground"]
+
 [node name="TileMap" type="TileMap" parent="."]
-scale = Vector2( 4, 4 )
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 16, 16 )
 cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
 collision_layer = 8
 collision_mask = 0
 format = 1
-tile_data = PoolIntArray( -1114096, 1, 0, -1114095, 1, 5, -983028, 1, 0, -983027, 1, 2, -983026, 1, 5, -786423, 1, 0, -786422, 1, 2, -786421, 1, 5, -589817, 3, 0, -589816, 3, 0, -589812, 1, 0, -589811, 1, 2, -589810, 1, 1, -589809, 1, 5, -458742, 3, 0, -458741, 3, 0, -393203, 2, 0, -393202, 2, 4, -393201, 2, 4, -393200, 2, 5, -393196, 2, 1, -393140, 0, 1, -327604, 0, 1, -262133, 3, 0, -262132, 3, 0, -262131, 3, 0, -262123, 2, 1, -262068, 0, 1, -196532, 0, 1, -131056, 2, 0, -131055, 2, 2, -131054, 2, 5, -130996, 0, 1, -65522, 3, 0, -65521, 3, 0, -65520, 3, 0, -65515, 2, 1, -65460, 0, 1, 76, 0, 1, 65612, 0, 1, 131081, 3, 0, 131082, 3, 0, 131089, 2, 0, 131090, 2, 2, 131091, 2, 2, 131092, 2, 5, 131148, 0, 1, 196684, 0, 1, 262220, 0, 1, 327694, 3, 0, 327695, 3, 0, 327696, 3, 0, 327697, 3, 0, 327700, 0, 0, 327701, 0, 1, 327702, 0, 5, 327756, 0, 1, 393292, 0, 1, 458828, 0, 1, 524306, 0, 0, 524307, 0, 3, 524308, 0, 1, 524309, 0, 5, 524364, 0, 1, 589900, 0, 1, 655436, 0, 1, 720910, 0, 0, 720911, 0, 3, 720912, 0, 4, 720913, 0, 3, 720914, 0, 5, 720972, 0, 1, 786508, 0, 1, 851976, 0, 0, 851977, 0, 1, 851978, 0, 4, 851979, 0, 5, 852044, 0, 1, 917580, 0, 1, 983116, 0, 1, 1048576, 0, 0, 1048577, 0, 4, 1048578, 0, 2, 1048579, 0, 3, 1048580, 0, 1, 1048581, 0, 1, 1048582, 0, 4, 1048583, 0, 4, 1048584, 0, 2, 1048585, 0, 3, 1048586, 0, 2, 1048587, 0, 1, 1048588, 0, 3, 1048589, 0, 2, 1048590, 0, 3, 1048591, 0, 1, 1048592, 0, 3, 1048593, 0, 2, 1048594, 0, 4, 1048595, 0, 2, 1048596, 0, 4, 1048597, 0, 4, 1048598, 0, 1, 1048599, 0, 3, 1048600, 0, 2, 1048601, 0, 2, 1048602, 0, 4, 1048603, 0, 3, 1048604, 0, 1, 1048605, 0, 5, 1048606, 3, 0, 1048607, 3, 1, 1048608, 3, 3, 1048609, 3, 0, 1048610, 3, 3, 1048611, 3, 2, 1048612, 3, 1, 1048613, 3, 3, 1048614, 3, 0, 1048615, 3, 0, 1048616, 3, 1, 1048617, 3, 2, 1048618, 3, 3, 1048619, 3, 1, 1048620, 3, 0, 1048621, 3, 2, 1048622, 3, 0, 1048623, 3, 0, 1048624, 0, 0, 1048625, 0, 1, 1048626, 0, 1, 1048627, 0, 1, 1048628, 0, 1, 1048629, 0, 1, 1048630, 0, 1, 1048631, 0, 1, 1048632, 0, 1, 1048633, 0, 1, 1048634, 0, 1, 1048635, 0, 1, 1048636, 0, 1, 1048637, 0, 1, 1048638, 0, 1, 1048639, 0, 1, 1048640, 0, 1, 1048641, 0, 1, 1048642, 0, 1, 1048643, 0, 1, 1048644, 0, 1, 1048645, 0, 1, 1048646, 0, 1, 1048647, 0, 1, 1048648, 0, 1, 1048649, 0, 1, 1048650, 0, 1, 1048651, 0, 1, 1048652, 0, 1 )
-
-[node name="Enemy" parent="." instance=ExtResource( 3 )]
-position = Vector2( 2147.18, 1015.86 )
+tile_data = PoolIntArray( -1114096, 1, 0, -1114095, 1, 5, -983028, 1, 0, -983027, 1, 2, -983026, 1, 5, -786423, 1, 0, -786422, 1, 2, -786421, 1, 5, -589812, 1, 0, -589811, 1, 2, -589810, 1, 1, -589809, 1, 5, -393203, 2, 0, -393202, 2, 4, -393201, 2, 4, -393200, 2, 5, -393196, 2, 1, -262123, 2, 1, -131056, 2, 0, -131055, 2, 1, -131054, 2, 5, -65515, 2, 1, 131089, 2, 0, 131090, 2, 2, 131091, 2, 2, 131092, 2, 5, 327700, 0, 0, 327701, 0, 1, 327702, 0, 5, 589823, 3, 0, 524306, 0, 0, 524307, 0, 3, 524308, 0, 1, 524309, 0, 5, 655359, 3, 0, 720895, 3, 0, 786431, 3, 0, 720910, 0, 0, 720911, 0, 3, 720912, 0, 4, 720913, 0, 3, 720914, 0, 5, 851967, 3, 0, 917503, 3, 0, 851976, 0, 0, 851977, 0, 1, 851978, 0, 4, 851979, 0, 5, 983039, 3, 0, 1048575, 3, 0, 1114111, 3, 0, 1048576, 0, 0, 1048577, 0, 2, 1048578, 0, 4, 1048579, 0, 5, 1048580, 1, 0, 1048581, 1, 3, 1048582, 1, 5, 1048583, 0, 0, 1048584, 0, 4, 1048585, 0, 3, 1048586, 0, 2, 1048587, 0, 3, 1048588, 0, 2, 1048589, 0, 4, 1048590, 0, 1, 1048591, 0, 4, 1048592, 0, 1, 1048593, 0, 3, 1048594, 0, 2, 1048595, 0, 4, 1048596, 0, 1, 1048597, 0, 3, 1048598, 0, 4, 1048599, 0, 1, 1048600, 0, 2, 1048601, 0, 2, 1048602, 0, 4, 1048603, 0, 2, 1048604, 0, 3, 1048605, 0, 5 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
-position = Vector2( 272, 264 )
+position = Vector2( 30, 250 )
+acceleration = 0.5
 
 [node name="Camera2D" parent="Player" index="2"]
+position = Vector2( 0, -70 )
 limit_right = 3680
-
-[node name="Coin" parent="." instance=ExtResource( 5 )]
-position = Vector2( 540.089, 810.373 )
-
-[node name="Coin2" parent="." instance=ExtResource( 5 )]
-position = Vector2( 640.949, 810.373 )
-
-[node name="Coin3" parent="." instance=ExtResource( 5 )]
-position = Vector2( 738.555, 810.373 )
-
-[node name="Coin4" parent="." instance=ExtResource( 5 )]
-position = Vector2( 940.275, 657.456 )
-
-[node name="Coin5" parent="." instance=ExtResource( 5 )]
-position = Vector2( 1028.12, 657.456 )
-
-[node name="Coin6" parent="." instance=ExtResource( 5 )]
-position = Vector2( 1115.97, 657.456 )
-
-[node name="Coin7" parent="." instance=ExtResource( 5 )]
-position = Vector2( 1200.56, 657.456 )
 
 [node name="Portal2D" parent="." instance=ExtResource( 6 )]
 position = Vector2( 4181.42, 716.2 )
 next_scene = ExtResource( 7 )
+
+[node name="Node2D" type="Node2D" parent="."]
 
 [editable path="Player"]

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/stone_tiles.png-943afc23c8e9e0b309553a28151d69d1.stex"
+path="res://.import/Run04.png-fa1f1a55b2167e106fd8d4aa9027f9ad.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/stone_tiles.png"
-dest_files=[ "res://.import/stone_tiles.png-943afc23c8e9e0b309553a28151d69d1.stex" ]
+source_file="res://assets/tobor/Run04.png"
+dest_files=[ "res://.import/Run04.png-fa1f1a55b2167e106fd8d4aa9027f9ad.stex" ]
 
 [params]
 
@@ -31,4 +31,4 @@ process/invert_color=false
 stream=false
 size_limit=0
 detect_3d=true
-svg/scale=4.0
+svg/scale=1.0
