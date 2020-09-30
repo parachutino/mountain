@@ -1,16 +1,69 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://assets/tobor/Idle01.png" type="Texture" id=1]
+[ext_resource path="res://assets/tobor/tobor.png" type="Texture" id=1]
 [ext_resource path="res://src/Actors/Player.gd" type="Script" id=2]
 
-[sub_resource type="RectangleShape2D" id=4]
+[sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 6, 14 )
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 7.07787, 21.0871 )
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 7, 3.17727 )
+[sub_resource type="Animation" id=3]
+resource_name = "idle"
+length = 0.8
+loop = true
+step = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("player:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ 0, 1 ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "run"
+length = 0.5
+loop = true
+step = 0.125
+tracks/0/type = "value"
+tracks/0/path = NodePath("player:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.375 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 2, 5 ]
+}
+
+[sub_resource type="AnimationNodeAnimation" id=5]
+animation = "idle"
+
+[sub_resource type="AnimationNodeAnimation" id=6]
+animation = "run"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=9]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=10]
+
+[sub_resource type="AnimationNodeStateMachine" id=7]
+states/idle/node = SubResource( 5 )
+states/idle/position = Vector2( 474, 60 )
+states/run/node = SubResource( 6 )
+states/run/position = Vector2( 498, 169 )
+transitions = [ "idle", "run", SubResource( 9 ), "run", "idle", SubResource( 10 ) ]
+start_node = "idle"
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=8]
 
 [node name="Player" type="KinematicBody2D"]
 collision_mask = 8
@@ -21,11 +74,14 @@ stomp_impulse = 250.0
 
 [node name="player" type="Sprite" parent="."]
 position = Vector2( 0, -18 )
+scale = Vector2( -1, 1 )
 texture = ExtResource( 1 )
+hframes = 6
+frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -14.5 )
-shape = SubResource( 4 )
+shape = SubResource( 1 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 0, -312.178 )
@@ -48,13 +104,14 @@ modulate = Color( 0.054902, 1, 0, 1 )
 position = Vector2( 0, -18 )
 shape = SubResource( 2 )
 
-[node name="GroundDetector" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 8
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/idle = SubResource( 3 )
+anims/run = SubResource( 4 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundDetector"]
-modulate = Color( 0, 0.0862745, 1, 1 )
-shape = SubResource( 3 )
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource( 7 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource( 8 )
 [connection signal="area_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_area_entered"]
 [connection signal="body_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_body_entered"]
-[connection signal="body_entered" from="GroundDetector" to="." method="_on_GroundDetector_body_entered"]
