@@ -10,6 +10,10 @@ export var terrainAcceleration = {
 	"stone" : 0.1,
 	"ice": 0.02
 	}
+	
+export (float, 0, 1) var windResistance = 0.2
+var wind = 0.4
+
 var acceleration: = 0.25
 var terrain = ""
 
@@ -94,8 +98,18 @@ func calculate_move_velocity(
 	var new_velocity: = linear_velocity
 	new_velocity.x = speed.x * direction.x
 	
+	"""EASY WIND"""
+	if (abs(wind) - windResistance) > 0:
+		new_velocity.x += speed.x * (wind - (wind/abs(wind) * windResistance))
+	"""---------"""
+	
 	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> acceleration = 0.05 aconsejado
+	#new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
 	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
+	
+	"""TRUE WIND... TOO STRONG (REPLACE EASY WIND)"""
+	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
+	"""-----------------------"""
 	
 #	# ACCEL v.2.0 BY DIEGO Aplica una "aceleración" lineal en proporción a la velocidad máxima... Variable publica: -> acceleration = 0.05 aconsejado
 #	if linear_velocity.x - new_velocity.x > acceleration:
@@ -108,7 +122,7 @@ func calculate_move_velocity(
 #		new_velocity.x = (linear_velocity.x - acceleration)
 #	elif new_velocity.x - linear_velocity.x > acceleration:
 #		new_velocity.x = (linear_velocity.x + acceleration)
-	
+ 
 	# DELTA sirve para mantener constante fuera del 
 	new_velocity.y += gravity * get_physics_process_delta_time()
 	if direction.y == -1.0:
