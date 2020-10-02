@@ -40,7 +40,7 @@ flag_disable_z = true
 direction = Vector3( 0, 1, 0 )
 spread = 5.0
 gravity = Vector3( 0, 100, 0 )
-initial_velocity = 100.0
+initial_velocity = 200.0
 initial_velocity_random = 0.5
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
@@ -52,12 +52,14 @@ load_path = "res://.import/rain.png-1e73ff7ebcf8382de47dc8764b679ec8.stex"
 
 [node name="Weather" type="Node2D"]
 script = ExtResource( 2 )
-weatherType = "snow"
+weatherType = "rain"
 wind = 1.0
 size = 1.0
+amount = 1000
 
 [node name="Snow" type="Particles2D" parent="."]
 material = SubResource( 1 )
+emitting = false
 amount = 500
 lifetime = 6.0
 speed_scale = 0.5
@@ -68,9 +70,9 @@ texture = ExtResource( 1 )
 
 [node name="Rain" type="Particles2D" parent="."]
 material = SubResource( 3 )
-emitting = false
 amount = 1000
 lifetime = 3.0
+speed_scale = 0.5
 visibility_rect = Rect2( -100, -100, 200, 500 )
 local_coords = false
 process_material = SubResource( 4 )

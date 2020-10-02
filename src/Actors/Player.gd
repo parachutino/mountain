@@ -11,7 +11,7 @@ export var terrainAcceleration = {
 	"ice": 0.02
 	}
 	
-export (float, 0, 1) var windResistance = 0.2
+export (float, 0, 1) var windResistance = 0.3
 var wind = 0.4
 
 var acceleration: = 0.25

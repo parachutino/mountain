@@ -68,8 +68,8 @@ position = Vector2( 4181.42, 716.2 )
 next_scene = ExtResource( 7 )
 
 [node name="Weather" parent="." instance=ExtResource( 3 )]
+wind = 0.284
 size = 0.5
-amount = 1000
 
 [editable path="Player"]
 
