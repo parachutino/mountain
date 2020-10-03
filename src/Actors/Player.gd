@@ -1,4 +1,14 @@
-extends Actor
+extends KinematicBody2D
+
+const FLOOR_NORMAL: = Vector2.UP
+
+# Define MAX velocidad en X y en Y...
+export var speed: = Vector2(200.0, 350.0)
+
+export var gravity: = 1000.0
+
+# Velocidad de movimiento 300px por segundo en X, 0px en Y
+var _velocity: = Vector2.ZERO
 
 export var stomp_impulse = 1000.0
 
@@ -54,7 +64,7 @@ func _physics_process(_delta: float) -> void:
 	# Define la aceleracion en base al terreno
 	acceleration = set_acceleration()
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
-	_velocity = calculate_move_velocity(_velocity, direction, speed, is_jump_interrupted)
+	_velocity = calculate_move_velocity(_velocity, direction, modified_speed, is_jump_interrupted)
 	
 	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
 		# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
@@ -97,16 +107,16 @@ func set_acceleration():
 func calculate_move_velocity(
 		linear_velocity: Vector2,
 		direction: Vector2,
-		speed: Vector2,
+		spd: Vector2,
 		is_jump_interrupted: bool
 	) -> Vector2:
 		
 	var new_velocity: = linear_velocity
-	new_velocity.x = speed.x * direction.x
+	new_velocity.x = spd.x * direction.x
 	
 	"""EASY WIND"""
 	if (abs(wind) - windResistance) > 0:
-		new_velocity.x += speed.x * (wind - (wind/abs(wind) * windResistance))
+		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
 	"""---------"""
 	
 	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> acceleration = 0.05 aconsejado
@@ -119,15 +129,17 @@ func calculate_move_velocity(
 	# SALTO (IMPORTANTE: DELTA) 
 	new_velocity.y += gravity * get_physics_process_delta_time()
 	if direction.y == -1.0:
-		new_velocity.y = speed.y * direction.y
+		new_velocity.y = spd.y * direction.y
 	if is_jump_interrupted:
-		new_velocity.y = sqrt(speed.y)
+		new_velocity.y = sqrt(spd.y)
 	return new_velocity
 
 
 func calculate_modified_speed():
 	if weather == "snow":
 		modified_speed.x = speed.x * (1 - weatherSize * snowResistance)
+	else: modified_speed.x = speed.x
+	# print_debug("Speed: ", speed, " / Modified Speed: ", modified_speed)
 	
 
 
