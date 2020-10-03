@@ -15,12 +15,13 @@ __meta__ = {
 }
 
 [node name="Area2D" type="Area2D" parent="."]
-collision_layer = 8
+collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource( 1 )
 
 [node name="Label" type="Label" parent="."]
+visible = false
 margin_left = 10.0
 margin_top = 10.0
 margin_right = 114.0
@@ -87,4 +88,4 @@ step = 0.01
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="area_entered" from="Area2D" to="." method="_on_Area2D_area_entered"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

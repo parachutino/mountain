@@ -24,6 +24,8 @@ onready var player: Node2D = get_node(playerNode)
 # Emiter folows position of this node.
 onready var follow: Node2D = get_node(followNode)
 
+# Set from WeatherControl to ignores last weather change
+var last_control: Control
 
 # Declare member variables here. Examples:
 # var a: int = 2
@@ -33,15 +35,15 @@ onready var follow: Node2D = get_node(followNode)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	change_weather()
-	darkness()
+	darkness_position()
 	position = get_viewport_transform().get_origin() + Vector2(get_viewport_rect().size.x / 2, 0) # Initially positions the emiter in the top center of the screen
 	snow.process_material.emission_box_extents.x = get_viewport_rect().size.x * 2 # Sets emiter width to N times the screen size
 	rain.process_material.emission_box_extents.x = get_viewport_rect().size.x * 2 # Sets emiter width to N times the screen size
 	
 func _physics_process(_delta: float) -> void:
 	if follow:
-		position = follow.position + Vector2(0, -get_viewport_rect().size.y) # Follows the position of node in "follow"
-		darkness()
+		position = follow.position + Vector2(0, -get_viewport_rect().size.y) # Weather follows the position of node in "follow"
+		darkness_position() # Darkness follows the viewport
 	
 func change_weather():
 	
@@ -62,7 +64,7 @@ func change_weather():
 		snow.process_material.initial_velocity = 100 + 400 * abs(wind)	
 		
 		# DARKEN DAY
-		darkness.color = nightColor.darkened(light-0.2)
+		darkness(nightColor.darkened(light - snow_darkness * size))
 
 	else: snow.emitting = false
 	
@@ -81,16 +83,24 @@ func change_weather():
 		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 		
 		# DARKEN DAY
-		darkness.color = nightColor.darkened(light-rain_darkness)
+		darkness(nightColor.darkened(light - rain_darkness * size))
 
 	else: rain.emitting = false
 	
 	if weatherType == 'clear':
-		darkness.color = nightColor.darkened(light)
+		darkness(nightColor.darkened(light))
+
+func darkness(new_color: Color):
+	
+	# Animation for darkness change
+	var tween = get_node("Tween")
+	tween.interpolate_property(darkness, "color",
+	darkness.color, new_color, 1,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
 
 
-
-func darkness():
+func darkness_position():
 	
 	# DARKNESS 4 TIMES VIEWPORT SIZE AND CENTERED... I THINK
 	darkness.rect_size = get_viewport_rect().size * 4
