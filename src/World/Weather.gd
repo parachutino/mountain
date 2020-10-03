@@ -103,10 +103,11 @@ func change_weather():
 		set_darkness(nightColor.darkened(light))
 		yield(tween, "tween_completed") # Waits light change to change weather
 
-	# CHANGE PLAYER WIND VARIABLE
+	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
 		player.wind = wind
 		player.weather = weatherType
+		player.weatherSize = size
 	
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount

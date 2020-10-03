@@ -12,12 +12,16 @@ export var terrainAcceleration = {
 	}
 
 export (float, 0, 1) var windResistance = 0.3
+export (float, 0, 1) var rainResistance = 0.5
+export (float, 0, 1) var snowResistance = 0.5
 
 var weather = 'clear'
+var weatherSize: float = 0
 var wind: float = 0
 
 var acceleration: = 0.25
 var terrain = ""
+var last_terrain = "normal"
 
 var state_machine
 var player
@@ -72,7 +76,53 @@ func get_direction() -> Vector2:
 
 	return dir
 
+
 func set_acceleration():
+	
+	var accel = get_terrain_acceleration()
+	
+	# RAIN AFFECTS ACCELERATION
+	if weather == "rain":
+		accel = accel * (1 - weatherSize * rainResistance)
+
+	return accel
+		
+
+
+	
+func calculate_move_velocity(
+		linear_velocity: Vector2,
+		direction: Vector2,
+		speed: Vector2,
+		is_jump_interrupted: bool
+	) -> Vector2:
+		
+	var new_velocity: = linear_velocity
+	new_velocity.x = speed.x * direction.x
+	
+	"""EASY WIND"""
+	if (abs(wind) - windResistance) > 0:
+		new_velocity.x += speed.x * (wind - (wind/abs(wind) * windResistance))
+	"""---------"""
+	
+	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> acceleration = 0.05 aconsejado
+	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
+	
+	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
+	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
+	"""-----------------------"""
+ 
+	# DELTA sirve para mantener constante fuera del 
+	new_velocity.y += gravity * get_physics_process_delta_time()
+	if direction.y == -1.0:
+		new_velocity.y = speed.y * direction.y
+	if is_jump_interrupted:
+		new_velocity.y = sqrt(speed.y)
+	return new_velocity
+		
+
+func get_terrain_acceleration():
+	var ter_accel: float
 	if is_on_floor():
 		var collision = get_slide_collision(0)
 		if collision.collider is TileMap:
@@ -85,54 +135,12 @@ func set_acceleration():
 				terrain = collision.collider.tile_set.tile_get_name(tile_id)
 				# print_debug(terrain)
 				if terrain in terrainAcceleration:
-					return terrainAcceleration[terrain] # Assegna acceleration in base al tipo di tile
-				else: return terrainAcceleration["normal"]
-	else: return terrainAcceleration["air"] # Acceleration on air
-	return acceleration
-
-	
-func calculate_move_velocity(
-		linear_velocity: Vector2,
-		direction: Vector2,
-		speed: Vector2,
-		is_jump_interrupted: bool
-	) -> Vector2:
-	var new_velocity: = linear_velocity
-	new_velocity.x = speed.x * direction.x
-	
-	"""EASY WIND"""
-	if (abs(wind) - windResistance) > 0:
-		new_velocity.x += speed.x * (wind - (wind/abs(wind) * windResistance))
-	"""---------"""
-	
-	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> acceleration = 0.05 aconsejado
-	#new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
-	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
-	
-	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
-	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
-	"""-----------------------"""
-	
-#	# ACCEL v.2.0 BY DIEGO Aplica una "aceleración" lineal en proporción a la velocidad máxima... Variable publica: -> acceleration = 0.05 aconsejado
-#	if linear_velocity.x - new_velocity.x > acceleration:
-#		new_velocity.x = (linear_velocity.x - speed.x * acceleration)
-#	elif new_velocity.x - linear_velocity.x > speed.x * acceleration:
-#		new_velocity.x = (linear_velocity.x + speed.x * acceleration)	
-	
-#	# ACCEL v1.0 BY DIEGO Aplica una "aceleración" lineal predefinida... Variable publica: -> acceleration = 50 aconsejado
-#	if linear_velocity.x - new_velocity.x > acceleration:
-#		new_velocity.x = (linear_velocity.x - acceleration)
-#	elif new_velocity.x - linear_velocity.x > acceleration:
-#		new_velocity.x = (linear_velocity.x + acceleration)
- 
-	# DELTA sirve para mantener constante fuera del 
-	new_velocity.y += gravity * get_physics_process_delta_time()
-	if direction.y == -1.0:
-		new_velocity.y = speed.y * direction.y
-	if is_jump_interrupted:
-		new_velocity.y = sqrt(speed.y)
-	return new_velocity
-		
+					ter_accel = terrainAcceleration[terrain] # Assegna acceleration in base al tipo di tile
+				else: ter_accel = terrainAcceleration["normal"]
+			else: ter_accel = terrainAcceleration[last_terrain]
+	else: ter_accel = terrainAcceleration["air"] # Acceleration on air
+	last_terrain = terrain
+	return ter_accel
 
 # Calcula la velocidad del salto
 func calculate_stomp_velocity(linear_velocity: Vector2, impulse: float) -> Vector2:
