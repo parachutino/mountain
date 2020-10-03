@@ -15,11 +15,12 @@ export (float, 0, 1) var windResistance = 0.3
 export (float, 0, 1) var rainResistance = 0.5
 export (float, 0, 1) var snowResistance = 0.5
 
-var weather = 'clear'
+var weather = 'clear' setget weather_changed
 var weatherSize: float = 0
 var wind: float = 0
 
 var acceleration: = 0.25
+var modified_speed: Vector2 = speed
 var terrain = ""
 var last_terrain = "normal"
 
@@ -38,6 +39,10 @@ func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
 func _on_EnemyDetector_body_entered(_body):
 	# Mata al player
 	die()
+	
+func weather_changed(new_weather):
+	weather = new_weather
+	calculate_modified_speed()
 
 # Esta funcion se ejecuta y ejecuta la misma funcion del padre una vez por physic frame....
 func _physics_process(_delta: float) -> void:
@@ -86,10 +91,9 @@ func set_acceleration():
 		accel = accel * (1 - weatherSize * rainResistance)
 
 	return accel
-		
 
 
-	
+
 func calculate_move_velocity(
 		linear_velocity: Vector2,
 		direction: Vector2,
@@ -112,14 +116,20 @@ func calculate_move_velocity(
 	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
 	"""-----------------------"""
  
-	# DELTA sirve para mantener constante fuera del 
+	# SALTO (IMPORTANTE: DELTA) 
 	new_velocity.y += gravity * get_physics_process_delta_time()
 	if direction.y == -1.0:
 		new_velocity.y = speed.y * direction.y
 	if is_jump_interrupted:
 		new_velocity.y = sqrt(speed.y)
 	return new_velocity
-		
+
+
+func calculate_modified_speed():
+	if weather == "snow":
+		modified_speed.x = speed.x * (1 - weatherSize * snowResistance)
+	
+
 
 func get_terrain_acceleration():
 	var ter_accel: float
