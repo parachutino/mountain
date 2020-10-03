@@ -51,9 +51,13 @@ func change_weather():
 	
 	if weatherType == 'snow':
 		
+		# CONTROLS IF START SNOW FROM 0 OR CHANGE SNOW TYPE
+		if snow.emitting == false: snow.preprocess = 0
+		else: snow.preprocess = snow.lifetime
+		
 		# SNOW SETTINGS
 		snow.emitting = true
-		snow.amount = amount + amount * abs(wind)
+		snow.amount = amount + amount * abs(wind) # PROBLEMA!! Resetea las particulas
 		snow.process_material.anim_offset = size
 		# snow.process_material.set("anim_offset", size) # Alternative way to set property...
 	
@@ -64,15 +68,19 @@ func change_weather():
 		snow.process_material.initial_velocity = 100 + 400 * abs(wind)	
 		
 		# DARKEN DAY
-		darkness(nightColor.darkened(light - snow_darkness * size))
+		set_darkness(nightColor.darkened(light - snow_darkness * size))
 
 	else: snow.emitting = false
 	
 	if weatherType == 'rain':
 		
+		# CONTROLS IF START RAIN FROM 0 OR CHANGE RAIN TYPE
+		if rain.emitting == false: rain.preprocess = 0
+		else: rain.preprocess = rain.lifetime
+		
 		# RAIN SETTINGS
 		rain.emitting = true
-		rain.amount = amount + amount * abs(wind)
+		rain.amount = amount + amount * abs(wind) # PROBLEMA!! Resetea las particulas
 		rain.process_material.anim_offset = size
 		# snow.process_material.set("anim_offset", size) # Alternative way to set property...
 	
@@ -83,14 +91,14 @@ func change_weather():
 		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 		
 		# DARKEN DAY
-		darkness(nightColor.darkened(light - rain_darkness * size))
+		set_darkness(nightColor.darkened(light - rain_darkness * size))
 
 	else: rain.emitting = false
 	
 	if weatherType == 'clear':
-		darkness(nightColor.darkened(light))
+		set_darkness(nightColor.darkened(light))
 
-func darkness(new_color: Color):
+func set_darkness(new_color: Color):
 	
 	# Animation for darkness change
 	var tween = get_node("Tween")

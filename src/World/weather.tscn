@@ -65,6 +65,7 @@ material = SubResource( 1 )
 emitting = false
 amount = 500
 lifetime = 6.0
+preprocess = 6.0
 speed_scale = 0.5
 visibility_rect = Rect2( -100, -100, 200, 500 )
 local_coords = false
