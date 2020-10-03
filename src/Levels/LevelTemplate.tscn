@@ -73,7 +73,6 @@ next_scene = ExtResource( 7 )
 
 [node name="Weather" parent="." instance=ExtResource( 3 )]
 weatherType = "clear"
-wind = 0.288
 size = 0.439
 
 [node name="WeatherControl" parent="." instance=ExtResource( 5 )]
@@ -84,7 +83,6 @@ margin_bottom = -93.0
 weatherType = "snow"
 wind = 0.746
 size = 1.0
-amount = 1000
 
 [node name="WeatherControl3" parent="." instance=ExtResource( 5 )]
 margin_left = 305.0
@@ -94,7 +92,6 @@ margin_bottom = 78.0
 weatherType = "rain"
 wind = -0.481
 size = 0.735
-amount = 1000
 
 [node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
 margin_left = 129.0
@@ -104,7 +101,6 @@ margin_bottom = 217.0
 weatherType = "rain"
 wind = -0.284
 size = 0.447
-amount = 1000
 
 [node name="WeatherControl5" parent="." instance=ExtResource( 5 )]
 margin_left = 600.783
@@ -114,17 +110,15 @@ margin_bottom = 99.6157
 weatherType = "snow"
 wind = 0.459
 size = 0.675
-amount = 1000
 
 [node name="WeatherControl4" parent="." instance=ExtResource( 5 )]
 margin_left = 638.0
 margin_top = 188.0
 margin_right = 882.0
 margin_bottom = 249.0
-weatherType = "snow"
+weatherType = "clear"
 wind = 0.232
 size = 0.235
-amount = 1000
 
 [node name="WeatherControl6" parent="." instance=ExtResource( 5 )]
 margin_left = 929.352
@@ -134,6 +128,6 @@ margin_bottom = 251.119
 weatherType = "snow"
 wind = 1.0
 size = 1.0
-amount = 1000
+amount = 2000
 
 [editable path="Player"]

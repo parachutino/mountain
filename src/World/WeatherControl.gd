@@ -4,7 +4,7 @@ extends Control
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
 export (float, -1, 1) var wind = 0
 export (float, 0, 1) var size = 0.3
-export (int, 100, 1000) var amount = 250
+export (int, 100, 3000) var amount = 1000
 export (bool) var setLight = false
 export (float, 0, 1) var light = 1
 export var weatherNode: NodePath = "../Weather"
@@ -18,12 +18,8 @@ func _ready() -> void:
 	collisionShape2D.shape.extents = rect_size/2
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-#	pass
 
-
-func _on_Area2D_area_entered(area: Area2D) -> void:
+func _process(delta: float) -> void:
 	pass
 
 

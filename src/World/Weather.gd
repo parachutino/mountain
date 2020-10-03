@@ -3,20 +3,21 @@ extends Node2D
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
 export (float, -1, 1) var wind = 0
 export (float, 0, 1) var size = 0.3
-export (int, 100, 1000) var amount = 250
+export (int, 100, 3000) var amount = 1000
 export (float, 0, 1) var light = 1
+export (float, 0, 1) var snow_darkness = 0.2
+export (float, 0, 1) var rain_darkness = 0.3
+export (float, 0, 10) var lightChangeTime = 2
 
 export var playerNode: NodePath = "../Player"
 export var followNode: NodePath = "../Player"
 
 var nightColor: Color = Color.white # color SUBTRACTED to 
 
-var snow_darkness = 0.2
-var rain_darkness = 0.2
-
 onready var snow = $Snow
 onready var rain = $Rain
 onready var darkness = $Darkness
+onready var tween = $Tween
 
 # Defines Player to set wind behaviour
 onready var player: Node2D = get_node(playerNode)
@@ -26,6 +27,7 @@ onready var follow: Node2D = get_node(followNode)
 
 # Set from WeatherControl to ignores last weather change
 var last_control: Control
+var last_amount: int
 
 # Declare member variables here. Examples:
 # var a: int = 2
@@ -47,42 +49,44 @@ func _physics_process(_delta: float) -> void:
 	
 func change_weather():
 	
-	if player: player.wind = wind
-	
 	if weatherType == 'snow':
 		
-		# CONTROLS IF START SNOW FROM 0 OR CHANGE SNOW TYPE
-		if snow.emitting == false: snow.preprocess = 0
-		else: snow.preprocess = snow.lifetime
+		# DARKEN DAY
+		set_darkness(nightColor.darkened(light - snow_darkness * size))
+		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# SNOW SETTINGS
-		snow.emitting = true
-		snow.amount = amount + amount * abs(wind) # PROBLEMA!! Resetea las particulas
 		snow.process_material.anim_offset = size
-		# snow.process_material.set("anim_offset", size) # Alternative way to set property...
-	
+		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
+			if snow.emitting == true: snow.preprocess = snow.lifetime
+			snow.amount = amount
+		else: snow.preprocess = 0
+		# snow.amount = amount + amount * abs(wind) # Adds particles for stronger wind... deleted for 
+		
 		# SNOW WIND SETTINGS
 		snow.speed_scale = 0.5 + abs(wind) / 2
 		snow.process_material.direction.x = wind
 		snow.process_material.gravity.x = 100 * wind
 		snow.process_material.initial_velocity = 100 + 400 * abs(wind)	
 		
-		# DARKEN DAY
-		set_darkness(nightColor.darkened(light - snow_darkness * size))
-
+		snow.emitting = true
+		
 	else: snow.emitting = false
-	
+
+
 	if weatherType == 'rain':
 		
-		# CONTROLS IF START RAIN FROM 0 OR CHANGE RAIN TYPE
-		if rain.emitting == false: rain.preprocess = 0
-		else: rain.preprocess = rain.lifetime
+		# DARKEN DAY
+		set_darkness(nightColor.darkened(light - rain_darkness * size))
+		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# RAIN SETTINGS
-		rain.emitting = true
-		rain.amount = amount + amount * abs(wind) # PROBLEMA!! Resetea las particulas
 		rain.process_material.anim_offset = size
-		# snow.process_material.set("anim_offset", size) # Alternative way to set property...
+		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
+			if rain.emitting == true: rain.preprocess = rain.lifetime
+			rain.amount = amount
+		else: snow.preprocess = 0
+		# snow.process_material.set("anim_offset", size) # Alternative way to set a property...
 	
 		# RAIN WIND SETTINGS
 		rain.speed_scale = 0.5 + abs(wind) / 2
@@ -90,20 +94,29 @@ func change_weather():
 		rain.process_material.gravity.x = 100 * wind
 		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 		
-		# DARKEN DAY
-		set_darkness(nightColor.darkened(light - rain_darkness * size))
-
+		rain.emitting = true
+		
 	else: rain.emitting = false
-	
+
+
 	if weatherType == 'clear':
 		set_darkness(nightColor.darkened(light))
+		yield(tween, "tween_completed") # Waits light change to change weather
+
+	# CHANGE PLAYER WIND VARIABLE
+	if player:
+		player.wind = wind
+		player.weather = weatherType
+	
+	# SETS LAST_AMOUNT FOR CHANGE CHECK
+	last_amount = amount
+
 
 func set_darkness(new_color: Color):
 	
 	# Animation for darkness change
-	var tween = get_node("Tween")
 	tween.interpolate_property(darkness, "color",
-	darkness.color, new_color, 1,
+	darkness.color, new_color, lightChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
@@ -113,10 +126,3 @@ func darkness_position():
 	# DARKNESS 4 TIMES VIEWPORT SIZE AND CENTERED... I THINK
 	darkness.rect_size = get_viewport_rect().size * 4
 	darkness.rect_position = get_viewport_rect().position - Vector2(get_viewport_rect().size.x*2, get_viewport_rect().size.y)
-#	darkness.rect_size = get_viewport_rect().size * 2
-#	darkness.rect_position = get_viewport_rect().position - Vector2(get_viewport_rect().size.x, 0)
-	
-	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-#	pass

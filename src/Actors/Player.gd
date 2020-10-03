@@ -10,9 +10,11 @@ export var terrainAcceleration = {
 	"stone" : 0.1,
 	"ice": 0.02
 	}
-	
+
 export (float, 0, 1) var windResistance = 0.3
-var wind = 0.4
+
+var weather = 'clear'
+var wind: float = 0
 
 var acceleration: = 0.25
 var terrain = ""
@@ -107,7 +109,7 @@ func calculate_move_velocity(
 	#new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
 	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
 	
-	"""TRUE WIND... TOO STRONG (REPLACE EASY WIND)"""
+	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
 	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
 	"""-----------------------"""
 	
