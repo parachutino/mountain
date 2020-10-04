@@ -1,6 +1,5 @@
 extends Control
 
-
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
 export (float, -1, 1) var wind = 0
 export (float, 0, 1) var size = 0.3
@@ -12,6 +11,9 @@ var weather: Node2D
 
 onready var collisionShape2D = $Area2D/CollisionShape2D
 # Called when the node enters the scene tree for the first time.
+
+
+
 func _ready() -> void:
 	weather = get_node(weatherNode)
 	collisionShape2D.position = rect_size / 2

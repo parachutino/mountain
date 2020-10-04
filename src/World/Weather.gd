@@ -58,7 +58,7 @@ func change_weather():
 		# SNOW SETTINGS
 		snow.process_material.anim_offset = size
 		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
-			if snow.emitting == true: snow.preprocess = snow.lifetime
+			if snow.emitting == true: snow.preprocess = snow.lifetime * 2
 			snow.amount = amount
 		else: snow.preprocess = 0
 		# snow.amount = amount + amount * abs(wind) # Adds particles for stronger wind... deleted for 
@@ -83,9 +83,9 @@ func change_weather():
 		# RAIN SETTINGS
 		rain.process_material.anim_offset = size
 		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
-			if rain.emitting == true: rain.preprocess = rain.lifetime
+			if rain.emitting == true: rain.preprocess = rain.lifetime * 2
 			rain.amount = amount
-		else: snow.preprocess = 0
+		else: rain.preprocess = 0
 		# snow.process_material.set("anim_offset", size) # Alternative way to set a property...
 	
 		# RAIN WIND SETTINGS
@@ -111,7 +111,14 @@ func change_weather():
 	
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount
-
+"""
+func change_wind(weather, new_wind):
+	
+	tween.interpolate_property(darkness, "color",
+	darkness.color, new_color, lightChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
+"""
 
 func set_darkness(new_color: Color):
 	

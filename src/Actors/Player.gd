@@ -1,4 +1,5 @@
 extends KinematicBody2D
+class_name Player
 
 const FLOOR_NORMAL: = Vector2.UP
 
@@ -10,7 +11,7 @@ export var stomp_impulse = 1000.0
 # Da inercia al movimiento (by Diego)
 export var terrainAcceleration = {
 	"air" : 0.05,
-	"normal" : 0.25,
+	"unknown" : 0.25,
 	"grass" : 0.25,
 	"stone" : 0.1,
 	"ice": 0.02
@@ -27,8 +28,10 @@ var wind: float = 0
 var _velocity: = Vector2.ZERO
 var _acceleration: = 0.25
 var modified_speed: Vector2 = speed
+
 var terrain = ""
 var last_terrain = "normal"
+var player_tile_position: Vector2
 
 var state_machine
 var player
@@ -54,11 +57,11 @@ func weather_changed(new_weather):
 func _physics_process(_delta: float) -> void:
 		
 		
-	# Variable para hacer el salto mas corto si se suelta el boton...
-	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0
-	var direction: = get_direction()
-	# Define la aceleracion en base al terreno
-	_acceleration = set_acceleration()
+
+	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0 # Interrupts jump if button released
+	var direction: = get_direction() # Gets input from keyboard / joystick
+	_acceleration = set_acceleration() # Defines aceleration based on terrain
+	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
 	_velocity = calculate_move_velocity(_velocity, direction, modified_speed, is_jump_interrupted)
 	
@@ -90,7 +93,8 @@ func get_direction() -> Vector2:
 
 func set_acceleration():
 	
-	var accel = get_terrain_acceleration()
+#	var accel = get_terrain_acceleration()
+	var accel = terrainAcceleration[get_tile_type()]
 	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
@@ -138,8 +142,38 @@ func calculate_modified_speed():
 	else: modified_speed.x = speed.x
 	# print_debug("Speed: ", speed, " / Modified Speed: ", modified_speed)
 	
+func get_tile_type():
+	var current_tile
+	if is_on_floor():
+		var collision = get_slide_collision(0)
+		if collision.collider is TileMap:
+			# Find the character's position in tile coordinates
+			var tile_pos = collision.collider.world_to_map(position)
+			#tile_pos -= collision.normal # Find the colliding tile position
+			var tile_id = collision.collider.get_cellv(tile_pos) # Get the tile id
+			if not tile_id == TileMap.INVALID_CELL:
+				current_tile = collision.collider.tile_set.tile_get_name(tile_id)
+				if not current_tile in terrainAcceleration:
+					current_tile = "unknown"
+				
+				
+			else: current_tile = terrain
+			
+			if tile_pos != player_tile_position:
+				player_tile_position = tile_pos
+				if current_tile == "unknown": #DEBUG ERROR if Tile is unknown
+					print_debug("Unknown tile type. Check tile name in scene's TileMap and terrainAcceleration Dictionary in Player")
+				
+				# DEBUG tile position and type
+				# print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
+				
+	else: current_tile = "air" # Acceleration on air
+	
+	terrain = current_tile
+	return current_tile
 
 
+"""
 func get_terrain_acceleration():
 	var ter_accel: float
 	if is_on_floor():
@@ -160,7 +194,7 @@ func get_terrain_acceleration():
 	else: ter_accel = terrainAcceleration["air"] # Acceleration on air
 	last_terrain = terrain
 	return ter_accel
-
+"""
 # Calcula la velocidad del salto
 func calculate_stomp_velocity(linear_velocity: Vector2, impulse: float) -> Vector2:
 	var out: = 	linear_velocity
