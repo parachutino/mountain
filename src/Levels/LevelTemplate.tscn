@@ -75,14 +75,12 @@ next_scene = ExtResource( 7 )
 weatherType = "clear"
 size = 0.439
 
-[node name="WeatherControl" parent="." instance=ExtResource( 5 )]
-margin_left = 140.0
-margin_top = -172.0
-margin_right = 340.0
-margin_bottom = -93.0
+[node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
+margin_left = 129.0
+margin_top = 189.0
+margin_right = 193.0
+margin_bottom = 217.0
 weatherType = "snow"
-wind = 0.746
-size = 1.0
 
 [node name="WeatherControl3" parent="." instance=ExtResource( 5 )]
 margin_left = 305.0
@@ -93,19 +91,20 @@ weatherType = "rain"
 wind = -0.481
 size = 0.735
 
-[node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
-margin_left = 129.0
-margin_top = 189.0
-margin_right = 193.0
-margin_bottom = 217.0
-weatherType = "rain"
+[node name="WeatherControl" parent="." instance=ExtResource( 5 )]
+margin_left = 140.0
+margin_top = -172.0
+margin_right = 340.0
+margin_bottom = -93.0
+weatherType = "snow"
+wind = 0.746
 size = 1.0
 
 [node name="WeatherControl5" parent="." instance=ExtResource( 5 )]
 margin_left = 600.783
-margin_top = 38.6157
+margin_top = 37.2015
 margin_right = 717.783
-margin_bottom = 99.6157
+margin_bottom = 98.2015
 weatherType = "snow"
 wind = 0.459
 size = 0.675
@@ -116,8 +115,7 @@ margin_top = 188.0
 margin_right = 882.0
 margin_bottom = 249.0
 weatherType = "clear"
-wind = 0.232
-size = 0.235
+size = 1.0
 
 [node name="WeatherControl6" parent="." instance=ExtResource( 5 )]
 margin_left = 929.352

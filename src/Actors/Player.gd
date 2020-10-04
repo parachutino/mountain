@@ -4,12 +4,7 @@ const FLOOR_NORMAL: = Vector2.UP
 
 # Define MAX velocidad en X y en Y...
 export var speed: = Vector2(200.0, 350.0)
-
 export var gravity: = 1000.0
-
-# Velocidad de movimiento 300px por segundo en X, 0px en Y
-var _velocity: = Vector2.ZERO
-
 export var stomp_impulse = 1000.0
 
 # Da inercia al movimiento (by Diego)
@@ -29,7 +24,8 @@ var weather = 'clear' setget weather_changed
 var weatherSize: float = 0
 var wind: float = 0
 
-var acceleration: = 0.25
+var _velocity: = Vector2.ZERO
+var _acceleration: = 0.25
 var modified_speed: Vector2 = speed
 var terrain = ""
 var last_terrain = "normal"
@@ -62,7 +58,7 @@ func _physics_process(_delta: float) -> void:
 	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0
 	var direction: = get_direction()
 	# Define la aceleracion en base al terreno
-	acceleration = set_acceleration()
+	_acceleration = set_acceleration()
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
 	_velocity = calculate_move_velocity(_velocity, direction, modified_speed, is_jump_interrupted)
 	
@@ -119,8 +115,8 @@ func calculate_move_velocity(
 		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
 	"""---------"""
 	
-	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> acceleration = 0.05 aconsejado
-	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * acceleration
+	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> _acceleration = 0.05 aconsejado
+	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
 	
 	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
 	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
@@ -137,6 +133,7 @@ func calculate_move_velocity(
 
 func calculate_modified_speed():
 	if weather == "snow":
+		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
 		modified_speed.x = speed.x * (1 - weatherSize * snowResistance)
 	else: modified_speed.x = speed.x
 	# print_debug("Speed: ", speed, " / Modified Speed: ", modified_speed)
@@ -157,7 +154,7 @@ func get_terrain_acceleration():
 				terrain = collision.collider.tile_set.tile_get_name(tile_id)
 				# print_debug(terrain)
 				if terrain in terrainAcceleration:
-					ter_accel = terrainAcceleration[terrain] # Assegna acceleration in base al tipo di tile
+					ter_accel = terrainAcceleration[terrain] # Assegna _acceleration in base al tipo di tile
 				else: ter_accel = terrainAcceleration["normal"]
 			else: ter_accel = terrainAcceleration[last_terrain]
 	else: ter_accel = terrainAcceleration["air"] # Acceleration on air

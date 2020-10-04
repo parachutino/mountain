@@ -3,7 +3,7 @@ extends Node2D
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
 export (float, -1, 1) var wind = 0
 export (float, 0, 1) var size = 0.3
-export (int, 100, 3000) var amount = 1000
+export (int, 100, 3000) var amount = 1500
 export (float, 0, 1) var light = 1
 export (float, 0, 1) var snow_darkness = 0.2
 export (float, 0, 1) var rain_darkness = 0.3
@@ -89,7 +89,7 @@ func change_weather():
 		# snow.process_material.set("anim_offset", size) # Alternative way to set a property...
 	
 		# RAIN WIND SETTINGS
-		rain.speed_scale = 0.5 + abs(wind) / 2
+		rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
 		rain.process_material.direction.x = wind # / 2
 		rain.process_material.gravity.x = 100 * wind
 		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
@@ -106,8 +106,8 @@ func change_weather():
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
 		player.wind = wind
-		player.weather = weatherType
 		player.weatherSize = size
+		player.weather = weatherType # IMPORTANT: Set weatherType after size, or player won't use size to modify velocity...
 	
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount
