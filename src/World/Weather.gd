@@ -52,11 +52,14 @@ func change_weather():
 	if weatherType == 'snow':
 		
 		# DARKEN DAY
-		set_darkness(nightColor.darkened(light - snow_darkness * size))
+		change_light(nightColor.darkened(light - snow_darkness * size))
 		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# SNOW SETTINGS
-		snow.process_material.anim_offset = size
+		
+		change_size(snow, size)
+		# snow.process_material.anim_offset = size
+		
 		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
 			if snow.emitting == true: snow.preprocess = snow.lifetime * 2
 			snow.amount = amount
@@ -65,7 +68,10 @@ func change_weather():
 		
 		# SNOW WIND SETTINGS
 		snow.speed_scale = 0.5 + abs(wind) / 2
-		snow.process_material.direction.x = wind
+		
+		change_wind(snow, wind)
+		# snow.process_material.direction.x = wind
+		
 		snow.process_material.gravity.x = 100 * wind
 		snow.process_material.initial_velocity = 100 + 400 * abs(wind)	
 		
@@ -77,7 +83,7 @@ func change_weather():
 	if weatherType == 'rain':
 		
 		# DARKEN DAY
-		set_darkness(nightColor.darkened(light - rain_darkness * size))
+		change_light(nightColor.darkened(light - rain_darkness * size))
 		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# RAIN SETTINGS
@@ -90,7 +96,7 @@ func change_weather():
 	
 		# RAIN WIND SETTINGS
 		rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
-		rain.process_material.direction.x = wind # / 2
+		rain.process_material.direction.x = wind
 		rain.process_material.gravity.x = 100 * wind
 		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 		
@@ -100,27 +106,20 @@ func change_weather():
 
 
 	if weatherType == 'clear':
-		set_darkness(nightColor.darkened(light))
+		change_light(nightColor.darkened(light))
 		yield(tween, "tween_completed") # Waits light change to change weather
 
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
-		player.wind = wind
+		change_player_wind(wind) # player.wind = wind
 		player.weatherSize = size
 		player.weather = weatherType # IMPORTANT: Set weatherType after size, or player won't use size to modify velocity...
 	
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount
-"""
-func change_wind(weather, new_wind):
-	
-	tween.interpolate_property(darkness, "color",
-	darkness.color, new_color, lightChangeTime,
-	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-	tween.start()
-"""
 
-func set_darkness(new_color: Color):
+
+func change_light(new_color: Color):
 	
 	# Animation for darkness change
 	tween.interpolate_property(darkness, "color",
@@ -128,6 +127,26 @@ func set_darkness(new_color: Color):
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
+func change_size(weather, new_size):
+	
+	tween.interpolate_property(weather, "process_material:anim_offset",
+	weather.process_material.anim_offset, size, lightChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
+
+func change_wind(weather, new_wind):
+	
+	tween.interpolate_property(weather, "process_material:direction:x",
+	weather.process_material.direction.x, wind, lightChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
+
+func change_player_wind(new_wind):
+	
+	tween.interpolate_property(player, "wind",
+	player.wind, wind, lightChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
 
 func darkness_position():
 	

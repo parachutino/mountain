@@ -156,14 +156,12 @@ func get_tile_type():
 				if not current_tile in terrainAcceleration:
 					current_tile = "unknown"
 				
-				
 			else: current_tile = terrain
 			
 			if tile_pos != player_tile_position:
 				player_tile_position = tile_pos
 				if current_tile == "unknown": #DEBUG ERROR if Tile is unknown
 					print_debug("Unknown tile type. Check tile name in scene's TileMap and terrainAcceleration Dictionary in Player")
-				
 				# DEBUG tile position and type
 				# print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
 				
@@ -173,28 +171,7 @@ func get_tile_type():
 	return current_tile
 
 
-"""
-func get_terrain_acceleration():
-	var ter_accel: float
-	if is_on_floor():
-		var collision = get_slide_collision(0)
-		if collision.collider is TileMap:
-			# Find the character's position in tile coordinates
-			var tile_pos = collision.collider.world_to_map(position)
-			# Find the colliding tile position
-			#tile_pos -= collision.normal
-			var tile_id = collision.collider.get_cellv(tile_pos) # Get the tile id
-			if not tile_id == TileMap.INVALID_CELL:
-				terrain = collision.collider.tile_set.tile_get_name(tile_id)
-				# print_debug(terrain)
-				if terrain in terrainAcceleration:
-					ter_accel = terrainAcceleration[terrain] # Assegna _acceleration in base al tipo di tile
-				else: ter_accel = terrainAcceleration["normal"]
-			else: ter_accel = terrainAcceleration[last_terrain]
-	else: ter_accel = terrainAcceleration["air"] # Acceleration on air
-	last_terrain = terrain
-	return ter_accel
-"""
+
 # Calcula la velocidad del salto
 func calculate_stomp_velocity(linear_velocity: Vector2, impulse: float) -> Vector2:
 	var out: = 	linear_velocity
@@ -205,8 +182,4 @@ func calculate_stomp_velocity(linear_velocity: Vector2, impulse: float) -> Vecto
 func die() -> void:
 	queue_free()
 	PlayerData.deaths += 1
-	
-	
-#	# Indica que el MAX de "_velocity.y" es = "speed.y"
-#	_velocity.y = max(_velocity.y, speed.y)
 

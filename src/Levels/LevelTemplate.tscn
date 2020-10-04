@@ -51,6 +51,9 @@ tile_data = PoolIntArray( -1114096, 1, 0, -1114095, 1, 5, -983028, 1, 0, -983027
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 30, 250 )
 
+[node name="player" parent="Player" index="0"]
+frame = 0
+
 [node name="CollisionShape2D" parent="Player" index="1"]
 visible = false
 
@@ -112,8 +115,8 @@ margin_top = 188.0
 margin_right = 882.0
 margin_bottom = 249.0
 weatherType = "snow"
+wind = -0.864
 size = 1.0
-amount = 2000
 
 [node name="WeatherControl6" parent="." instance=ExtResource( 5 )]
 margin_left = 929.352
