@@ -22,7 +22,7 @@ export (float, 0, 1) var rainResistance = 0.5
 export (float, 0, 1) var snowResistance = 0.5
 
 var weather = 'clear' setget weather_changed
-var weatherSize: float = 0
+var weatherSize: float = 0 setget weatherSize_changed
 var wind: float = 0
 
 var _velocity: = Vector2.ZERO
@@ -51,6 +51,10 @@ func _on_EnemyDetector_body_entered(_body):
 	
 func weather_changed(new_weather):
 	weather = new_weather
+	calculate_modified_speed()
+	
+func weatherSize_changed(new_weatherSize):
+	weatherSize = new_weatherSize
 	calculate_modified_speed()
 
 # Esta funcion se ejecuta y ejecuta la misma funcion del padre una vez por physic frame....
@@ -141,8 +145,8 @@ func calculate_modified_speed():
 		modified_speed.x = speed.x * (1 - weatherSize * snowResistance)
 	else: modified_speed.x = speed.x
 	# print_debug("Speed: ", speed, " / Modified Speed: ", modified_speed)
-	
-func get_tile_type():
+
+func get_tile_type(): #sets terrain variable and returns tile_type
 	var current_tile
 	if is_on_floor():
 		var collision = get_slide_collision(0)
@@ -172,13 +176,13 @@ func get_tile_type():
 
 
 
-# Calcula la velocidad del salto
+# Calculates jump velocity
 func calculate_stomp_velocity(linear_velocity: Vector2, impulse: float) -> Vector2:
 	var out: = 	linear_velocity
 	out.y = -impulse
 	return out
 
-# Funcion de cuando muere el Player
+# Player dies
 func die() -> void:
 	queue_free()
 	PlayerData.deaths += 1

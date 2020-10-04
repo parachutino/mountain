@@ -7,7 +7,7 @@ export (int, 100, 3000) var amount = 1500
 export (float, 0, 1) var light = 1
 export (float, 0, 1) var snow_darkness = 0.2
 export (float, 0, 1) var rain_darkness = 0.3
-export (float, 0, 10) var lightChangeTime = 2
+export (float, 0, 10) var weatherChangeTime = 2
 
 export var playerNode: NodePath = "../Player"
 export var followNode: NodePath = "../Player"
@@ -56,24 +56,21 @@ func change_weather():
 		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# SNOW SETTINGS
-		
 		change_size(snow, size)
 		# snow.process_material.anim_offset = size
 		
-		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
+		if last_amount != amount: # PROBLEM!! Changing amount resets particle emitter!!!
 			if snow.emitting == true: snow.preprocess = snow.lifetime * 2
 			snow.amount = amount
 		else: snow.preprocess = 0
 		# snow.amount = amount + amount * abs(wind) # Adds particles for stronger wind... deleted for 
 		
 		# SNOW WIND SETTINGS
-		snow.speed_scale = 0.5 + abs(wind) / 2
+		change_wind_speed(snow, 0.5 + abs(wind) / 2) # snow.speed_scale = 0.5 + abs(wind) / 2
 		
-		change_wind(snow, wind)
-		# snow.process_material.direction.x = wind
+		change_wind_direction(snow, wind) # snow.process_material.direction.x = wind
 		
-		snow.process_material.gravity.x = 100 * wind
-		snow.process_material.initial_velocity = 100 + 400 * abs(wind)	
+		snow.process_material.gravity.x = 70 * wind
 		
 		snow.emitting = true
 		
@@ -112,7 +109,7 @@ func change_weather():
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
 		change_player_wind(wind) # player.wind = wind
-		player.weatherSize = size
+		change_player_weatherSize(size) # player.weatherSize = size
 		player.weather = weatherType # IMPORTANT: Set weatherType after size, or player won't use size to modify velocity...
 	
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
@@ -123,28 +120,42 @@ func change_light(new_color: Color):
 	
 	# Animation for darkness change
 	tween.interpolate_property(darkness, "color",
-	darkness.color, new_color, lightChangeTime,
+	darkness.color, new_color, weatherChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
 func change_size(weather, new_size):
 	
 	tween.interpolate_property(weather, "process_material:anim_offset",
-	weather.process_material.anim_offset, size, lightChangeTime,
+	weather.process_material.anim_offset, new_size, weatherChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
-func change_wind(weather, new_wind):
+func change_wind_direction(weather, new_wind):
 	
 	tween.interpolate_property(weather, "process_material:direction:x",
-	weather.process_material.direction.x, wind, lightChangeTime,
+	weather.process_material.direction.x, new_wind, weatherChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
+	
+func change_wind_speed(weather, new_speed):
+	
+	tween.interpolate_property(weather, "speed_scale",
+	weather.speed_scale, new_speed, weatherChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
 func change_player_wind(new_wind):
 	
 	tween.interpolate_property(player, "wind",
-	player.wind, wind, lightChangeTime,
+	player.wind, new_wind, weatherChangeTime,
+	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.start()
+	
+func change_player_weatherSize(new_weatherSize):
+	
+	tween.interpolate_property(player, "weatherSize",
+	player.weatherSize, new_weatherSize, weatherChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
