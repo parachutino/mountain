@@ -1,0 +1,27 @@
+* [33mce59a25[m[33m ([m[1;36mHEAD -> [m[1;32mdiego[m[33m, [m[1;32mtemp[m[33m)[m Snow particles and player weather variables smoother transition
+* [33meaaf4c7[m[33m ([m[1;31morigin/diego[m[33m)[m Cambio nieve soft... PROBLEMA: Restart particles
+* [33mb342229[m Funcion get_tile_type() para calcular aceleracion y usar en otras cosas
+* [33m19b1842[m FIX: Calculo de velocidad con snow
+* [33m0bd3da9[m SNOW modifica la velocidad del player
+* [33m7775827[m Inicio speed modifier para SNOW
+* [33ma6b154f[m Rain and rainResistance afectan movimiento del player
+* [33md335bb3[m Weather - arreglado problema de transicion de clima
+* [33m42c0fa8[m Weather: Cambios de clima arreglados
+* [33ma8962d4[m Weather + Weather Control + Slow Darkness... Wind Animation missing
+* [33mf7ae276[m Inicio Weather Control
+* [33m99afe23[m Snow & Rain OK
+* [33mdac02a2[m Weather + Rain + Player responds to wind
+* [33m3d0809a[m WEATHER SYSTEM with snow (rain missing)
+* [33m7493912[m Mountain v.0.1 - Icon
+* [33m4a95193[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m Tobor Animation States
+* [33m69c89c2[m Tiles detection and different acceleration
+* [33mbbb43b6[m Tiles Horizontal
+* [33mfb15055[m No Git Integration... non funziona bene
+*   [33m70550e2[m Merge branch 'master' of https://github.com/parachutino/mountain iaster Merging with original :wq :q
+[32m|[m[33m\[m  
+[32m|[m * [33mda874aa[m 
+[32m|[m * [33m8a7649e[m "Prueba git en Godot"
+* [33m|[m [33m8518962[m Git Integration
+[33m|[m[33m/[m  
+* [33mf699e78[m GIT gitattributes & gitignore
+* [33ma6954cb[m Initial commit

@@ -56,20 +56,12 @@ func change_weather():
 		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# SNOW SETTINGS
-		change_size(snow, size)
-		# snow.process_material.anim_offset = size
-		
-		if last_amount != amount: # PROBLEM!! Changing amount resets particle emitter!!!
-			if snow.emitting == true: snow.preprocess = snow.lifetime * 2
-			snow.amount = amount
-		else: snow.preprocess = 0
-		# snow.amount = amount + amount * abs(wind) # Adds particles for stronger wind... deleted for 
+		change_size(snow, size) # snow.process_material.anim_offset = size
+		change_amount(snow, amount)
 		
 		# SNOW WIND SETTINGS
 		change_wind_speed(snow, 0.5 + abs(wind) / 2) # snow.speed_scale = 0.5 + abs(wind) / 2
-		
 		change_wind_direction(snow, wind) # snow.process_material.direction.x = wind
-		
 		snow.process_material.gravity.x = 70 * wind
 		
 		snow.emitting = true
@@ -84,18 +76,14 @@ func change_weather():
 		yield(tween, "tween_completed") # Waits light change to change weather
 		
 		# RAIN SETTINGS
-		rain.process_material.anim_offset = size
-		if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
-			if rain.emitting == true: rain.preprocess = rain.lifetime * 2
-			rain.amount = amount
-		else: rain.preprocess = 0
-		# snow.process_material.set("anim_offset", size) # Alternative way to set a property...
+		change_size(rain, size) # rain.process_material.anim_offset = size
+		change_amount(rain, amount)
 	
 		# RAIN WIND SETTINGS
-		rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
-		rain.process_material.direction.x = wind
-		rain.process_material.gravity.x = 100 * wind
-		rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
+		change_wind_speed(rain, 0.5 + abs(wind) / 2 + size / 2) # rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
+		change_wind_direction(rain, wind) # rain.process_material.direction.x = wind
+		rain.process_material.gravity.x = 200 * wind
+		# rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 		
 		rain.emitting = true
 		
@@ -108,10 +96,10 @@ func change_weather():
 
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
-		change_player_wind(wind) # player.wind = wind
+		player.weather = weatherType
 		change_player_weatherSize(size) # player.weatherSize = size
-		player.weather = weatherType # IMPORTANT: Set weatherType after size, or player won't use size to modify velocity...
-	
+		change_player_wind(wind) # player.wind = wind
+		
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount
 
@@ -131,13 +119,20 @@ func change_size(weather, new_size):
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 
+func change_amount(weather, new_amount):
+	
+	if last_amount != amount: # PROBLEM!! Changing amount resets particle emiter!!!
+		if weather.emitting == true: weather.preprocess = weather.lifetime * 2
+		weather.amount = amount
+	else: weather.preprocess = 0
+
 func change_wind_direction(weather, new_wind):
 	
 	tween.interpolate_property(weather, "process_material:direction:x",
 	weather.process_material.direction.x, new_wind, weatherChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
-	
+
 func change_wind_speed(weather, new_speed):
 	
 	tween.interpolate_property(weather, "speed_scale",

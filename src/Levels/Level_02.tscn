@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://src/Actors/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/tiles/tileset.tres" type="TileSet" id=2]
@@ -9,7 +9,7 @@
 [ext_resource path="res://src/Screens/EndScreen.tscn" type="PackedScene" id=7]
 [ext_resource path="res://src/UserInterface/UserInterface.tscn" type="PackedScene" id=8]
 
-
+[sub_resource type="AnimationNodeStateMachinePlayback" id=1]
 
 [node name="Level_02" type="Node2D"]
 __meta__ = {
@@ -48,8 +48,14 @@ position = Vector2( 2147.18, 1015.86 )
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 272, 264 )
 
+[node name="player" parent="Player" index="0"]
+frame = 1
+
 [node name="Camera2D" parent="Player" index="2"]
 limit_right = 8600
+
+[node name="AnimationTree" parent="Player" index="5"]
+parameters/playback = SubResource( 1 )
 
 [node name="Coin" parent="." instance=ExtResource( 5 )]
 position = Vector2( 540.089, 810.373 )
