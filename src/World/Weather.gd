@@ -7,12 +7,14 @@ export (int, 100, 3000) var amount = 1500
 export (float, 0, 1) var light = 1
 export (float, 0, 1) var snow_darkness = 0.2
 export (float, 0, 1) var rain_darkness = 0.3
-export (float, 0, 10) var weatherChangeTime = 2
+export (float, 1, 10) var lightChangeTime = 2
+export (bool) var delayWeatherChange = true # Wait light change before changing weather
+export (float, 1, 300) var weatherChangeTime = 2
+
+var nightColor: Color = Color.white # color SUBTRACTED to scene
 
 export var playerNode: NodePath = "../Player"
 export var followNode: NodePath = "../Player"
-
-var nightColor: Color = Color.white # color SUBTRACTED to 
 
 onready var snow = $Snow
 onready var rain = $Rain
@@ -49,68 +51,75 @@ func _physics_process(_delta: float) -> void:
 	
 func change_weather():
 	
+	if weatherType == 'clear':
+		change_light(nightColor.darkened(light))
+		yield(tween, "tween_completed") # Waits light change to change weather
+		apply_rain_settings()
+		apply_snow_settings()
+		yield(tween, "tween_completed") # Waits weather change before turning off emission
+	
 	if weatherType == 'snow':
 		
 		# DARKEN DAY
 		change_light(nightColor.darkened(light - snow_darkness * size))
-		yield(tween, "tween_completed") # Waits light change to change weather
+		if delayWeatherChange: yield(tween, "tween_completed") # Waits light change to change weather
 		
-		# SNOW SETTINGS
-		change_size(snow, size) # snow.process_material.anim_offset = size
 		change_amount(snow, amount)
-		
-		# SNOW WIND SETTINGS
-		change_wind_speed(snow, 0.5 + abs(wind) / 2) # snow.speed_scale = 0.5 + abs(wind) / 2
-		change_wind_direction(snow, wind) # snow.process_material.direction.x = wind
-		snow.process_material.gravity.x = 70 * wind
-		
+		apply_snow_settings()
 		snow.emitting = true
 		
 	else: snow.emitting = false
-
 
 	if weatherType == 'rain':
 		
 		# DARKEN DAY
 		change_light(nightColor.darkened(light - rain_darkness * size))
-		yield(tween, "tween_completed") # Waits light change to change weather
-		
-		# RAIN SETTINGS
-		change_size(rain, size) # rain.process_material.anim_offset = size
+		if delayWeatherChange: yield(tween, "tween_completed") # Waits light change to change weather
+
 		change_amount(rain, amount)
-	
-		# RAIN WIND SETTINGS
-		change_wind_speed(rain, 0.5 + abs(wind) / 2 + size / 2) # rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
-		change_wind_direction(rain, wind) # rain.process_material.direction.x = wind
-		rain.process_material.gravity.x = 200 * wind
-		# rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
-		
+		apply_rain_settings()
 		rain.emitting = true
 		
 	else: rain.emitting = false
 
 
-	if weatherType == 'clear':
-		change_light(nightColor.darkened(light))
-		yield(tween, "tween_completed") # Waits light change to change weather
-
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
 		player.weather = weatherType
-		change_player_weatherSize(size) # player.weatherSize = size
+		change_player_weatherSize(0.1) # player.weatherSize = size
 		change_player_wind(wind) # player.wind = wind
 		
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
 	last_amount = amount
 
-
 func change_light(new_color: Color):
 	
 	# Animation for darkness change
 	tween.interpolate_property(darkness, "color",
-	darkness.color, new_color, weatherChangeTime,
+	darkness.color, new_color, lightChangeTime,
 	Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
+	
+func apply_snow_settings():
+	
+	# SNOW SETTINGS
+	change_size(snow, size) # snow.process_material.anim_offset = size
+	
+	# SNOW WIND SETTINGS
+	change_wind_speed(snow, 0.5 + abs(wind) / 2) # snow.speed_scale = 0.5 + abs(wind) / 2
+	change_wind_direction(snow, wind) # snow.process_material.direction.x = wind
+	snow.process_material.gravity.x = 70 * wind
+
+func apply_rain_settings():
+	
+	# RAIN SETTINGS
+	change_size(rain, size) # rain.process_material.anim_offset = size
+	
+	# RAIN WIND SETTINGS
+	change_wind_speed(rain, 0.5 + abs(wind) / 2 + size / 2) # rain.speed_scale = 0.5 + abs(wind) / 2 + size / 2
+	change_wind_direction(rain, wind) # rain.process_material.direction.x = wind
+	rain.process_material.gravity.x = 200 * wind
+	# rain.process_material.initial_velocity = 200 + 400 * abs(wind)	
 
 func change_size(weather, new_size):
 	

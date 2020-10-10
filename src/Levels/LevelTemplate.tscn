@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://src/Actors/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/tiles/tileset.tres" type="TileSet" id=2]
@@ -7,7 +7,14 @@
 [ext_resource path="res://src/World/WeatherControl.tscn" type="PackedScene" id=5]
 [ext_resource path="res://src/Objects/Portal2D.tscn" type="PackedScene" id=6]
 [ext_resource path="res://src/Levels/Level_02.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/background/cloud_lonely.png" type="Texture" id=8]
 [ext_resource path="res://src/UserInterface/UserInterface.tscn" type="PackedScene" id=9]
+[ext_resource path="res://assets/background/sky_lightened.png" type="Texture" id=10]
+[ext_resource path="res://assets/background/clouds_mg_1_lightened.png" type="Texture" id=11]
+[ext_resource path="res://assets/background/clouds_mg_2.png" type="Texture" id=12]
+[ext_resource path="res://assets/background/clouds_mg_3.png" type="Texture" id=13]
+[ext_resource path="res://assets/background/glacial_mountains_lightened.png" type="Texture" id=14]
+[ext_resource path="res://assets/background/clouds_bg.png" type="Texture" id=15]
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=1]
 
@@ -21,10 +28,80 @@ layer = 128
 
 [node name="UserInterface" parent="UserInterface" instance=ExtResource( 9 )]
 
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Node2D"]
+scale = Vector2( 1.25, 1.25 )
+transform = Transform2D( 1.25, 0, 0, 1.25, 0, 0 )
+
+[node name="ParallaxSky" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0, 0 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 216 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxSky"]
+texture = ExtResource( 10 )
+centered = false
+
+[node name="ParallaxCloudsBG" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.05, 0.03 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxCloudsBG"]
+texture = ExtResource( 15 )
+centered = false
+
+[node name="ParrallaxCloudLonely" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.1, 0.06 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParrallaxCloudLonely"]
+texture = ExtResource( 8 )
+centered = false
+
+[node name="ParallaxMountains" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.15, 0.1 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxMountains"]
+texture = ExtResource( 14 )
+centered = false
+
+[node name="ParallaxCloudsMG3" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.2, 0.1 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxCloudsMG3"]
+texture = ExtResource( 13 )
+centered = false
+
+[node name="ParallaxCloudsMG2" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.3, 0.15 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxCloudsMG2"]
+texture = ExtResource( 12 )
+centered = false
+
+[node name="ParallaxCloudsMG1" type="ParallaxLayer" parent="Node2D/ParallaxBackground"]
+motion_scale = Vector2( 0.5, 0.2 )
+motion_offset = Vector2( 0, -125 )
+motion_mirroring = Vector2( 384, 0 )
+
+[node name="Sprite" type="Sprite" parent="Node2D/ParallaxBackground/ParallaxCloudsMG1"]
+texture = ExtResource( 11 )
+centered = false
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = -100
 
 [node name="background" type="TextureRect" parent="CanvasLayer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 0.00012207
@@ -34,10 +111,6 @@ stretch_mode = 5
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="ParallaxBackground" type="ParallaxBackground" parent="CanvasLayer"]
-
-[node name="ParallaxLayer" type="ParallaxLayer" parent="CanvasLayer/ParallaxBackground"]
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 2 )
@@ -70,7 +143,8 @@ next_scene = ExtResource( 7 )
 
 [node name="Weather" parent="." instance=ExtResource( 3 )]
 weatherType = "clear"
-size = 0.439
+wind = 0.0
+size = 0.0
 
 [node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
 margin_left = 149.568
@@ -81,11 +155,13 @@ weatherType = "snow"
 wind = -0.297
 
 [node name="WeatherControl5" parent="." instance=ExtResource( 5 )]
-margin_left = 383.0
-margin_top = 180.0
-margin_right = 489.0
-margin_bottom = 248.0
+margin_left = 347.46
+margin_top = 184.547
+margin_right = 453.46
+margin_bottom = 252.547
 weatherType = "clear"
+size = 0.0
+weatherChangeTime = 10.0
 
 [node name="WeatherControl3" parent="." instance=ExtResource( 5 )]
 margin_left = 305.0
@@ -131,6 +207,7 @@ margin_right = 1008.89
 margin_bottom = 251.0
 weatherType = "snow"
 wind = 0.5
+size = 0.1
 amount = 3000
 
 [node name="WeatherControl7" parent="." instance=ExtResource( 5 )]

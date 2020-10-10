@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/glacial_mountains_lightened.png-9ee146f10af917a2bd208a1d377e0f04.stex"
+path="res://.import/sky_lightened.png-5ba6743957bf0fd6f5dc7c6caa1bdf53.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/background/glacial_mountains_lightened.png"
-dest_files=[ "res://.import/glacial_mountains_lightened.png-9ee146f10af917a2bd208a1d377e0f04.stex" ]
+source_file="res://assets/background/sky_lightened.png"
+dest_files=[ "res://.import/sky_lightened.png-5ba6743957bf0fd6f5dc7c6caa1bdf53.stex" ]
 
 [params]
 
