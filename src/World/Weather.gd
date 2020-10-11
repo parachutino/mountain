@@ -52,11 +52,10 @@ func _physics_process(_delta: float) -> void:
 func change_weather():
 	
 	if weatherType == 'clear':
-		change_light(nightColor.darkened(light))
-		yield(tween, "tween_completed") # Waits light change to change weather
 		apply_rain_settings()
 		apply_snow_settings()
-		yield(tween, "tween_completed") # Waits weather change before turning off emission
+		if delayWeatherChange: yield(tween, "tween_completed") # Waits weather change before turning off emission and lower light
+		change_light(nightColor.darkened(light))
 	
 	if weatherType == 'snow':
 		
