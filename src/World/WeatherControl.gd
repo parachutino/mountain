@@ -1,4 +1,5 @@
 extends Control
+tool
 
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
 export (float, -1, 1) var wind = 0
@@ -19,14 +20,18 @@ onready var collisionShape2D = $Area2D/CollisionShape2D
 
 
 func _ready() -> void:
-	# weather = get_node(weatherNode)
+	var collisionShape2D = $Area2D/CollisionShape2D
 	collisionShape2D.position = rect_size / 2
-	collisionShape2D.shape.extents = rect_size/2
+	collisionShape2D.shape.extents = rect_size / 2
 
 
 
 func _process(delta: float) -> void:
-	pass
+	
+	if Engine.editor_hint: # Solo funziona in "Editor", non durante il gioco...
+		var collisionShape2D = $Area2D/CollisionShape2D
+		collisionShape2D.position = rect_size / 2
+		collisionShape2D.shape.extents = rect_size / 2
 
 
 
