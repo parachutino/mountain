@@ -16,7 +16,7 @@
 [ext_resource path="res://assets/background/glacial_mountains_lightened.png" type="Texture" id=14]
 [ext_resource path="res://assets/background/clouds_bg.png" type="Texture" id=15]
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id=3]
+[sub_resource type="AnimationNodeStateMachinePlayback" id=1]
 
 [node name="LevelTemplate" type="Node2D"]
 __meta__ = {
@@ -135,7 +135,7 @@ limit_right = 3680
 visible = false
 
 [node name="AnimationTree" parent="Player" index="5"]
-parameters/playback = SubResource( 3 )
+parameters/playback = SubResource( 1 )
 
 [node name="Portal2D" parent="." instance=ExtResource( 6 )]
 position = Vector2( 4181.02, 711.3 )
@@ -148,11 +148,19 @@ wind = 0.0
 size = 0.0
 
 [node name="WeatherControl" parent="." instance=ExtResource( 5 )]
-position = Vector2( -70.25, 14.5 )
-wind = 1.0
-areaSize = Vector2( 50, 30 )
+margin_left = 129.159
+margin_top = 186.995
+margin_right = 196.159
+margin_bottom = 238.995
+weatherType = "snow"
 
 [node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
-position = Vector2( -92.4967, 60.7193 )
+margin_left = 263.409
+margin_top = -9.86897
+margin_right = 341.409
+margin_bottom = 33.131
+weatherType = "snow"
+wind = 0.46
+size = 0.589
 
 [editable path="Player"]

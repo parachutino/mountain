@@ -1,4 +1,4 @@
-extends Area2D
+extends Control
 tool
 
 export (String, 'clear', 'rain', 'snow') var weatherType = 'sun'
@@ -10,28 +10,22 @@ export (float, 0, 1) var light = 1
 export (float, 1, 10) var lightChangeTime = 2
 export (bool) var delayWeatherChange = true # Wait light change before changing weather
 export (float, 1, 300) var weatherChangeTime = 2
-export var areaSize = Vector2(10, 10)
 
 export var weatherNode: NodePath = "../Weather"
 
 onready var weather: Node2D = get_node(weatherNode)
-onready var collisionShape2D = $CollisionShape2D
+onready var collisionShape2D = $Area2D/CollisionShape2D
 # Called when the node enters the scene tree for the first time.
 
 
 func _ready() -> void:
-	collisionShape2D.position = self.areaSize / 2
-	collisionShape2D.shape.extents = self.areaSize / 2
-
+	_control_Area2D_shape(collisionShape2D)
 
 func _process(delta: float) -> void:
 	
 	if Engine.editor_hint: # Solo funziona in "Editor", non durante il gioco...
-		var collisionShape2D = $CollisionShape2D
-		collisionShape2D.position = self.areaSize / 2
-		collisionShape2D.shape.extents = self.areaSize / 2
-		# print_debug("Shape: ", collisionShape2D.shape.extents, " Rect: ", rect.rect_size)
-
+		var collisionShape2D = $Area2D/CollisionShape2D
+		_control_Area2D_shape(collisionShape2D)
 
 
 func _on_Area2D_body_entered(body: Node) -> void:
@@ -50,3 +44,10 @@ func _on_Area2D_body_entered(body: Node) -> void:
 		
 		weather.change_weather()
 
+func _control_Area2D_shape(weather_shape) -> void:
+		weather_shape.position = rect_size / 2
+		
+		# MAKES EVERY INSTANCE SHAPE UNIQUE to follow individual "Control" node shape...
+		weather_shape.shape = RectangleShape2D.new()
+		weather_shape.shape.extents = rect_size / 2
+		# print_debug("Shape: ", collisionShape2D.shape.extents, " Rect: ", rect.rect_size)
