@@ -16,7 +16,7 @@
 [ext_resource path="res://assets/background/glacial_mountains_lightened.png" type="Texture" id=14]
 [ext_resource path="res://assets/background/clouds_bg.png" type="Texture" id=15]
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id=1]
+[sub_resource type="AnimationNodeStateMachinePlayback" id=3]
 
 [node name="LevelTemplate" type="Node2D"]
 __meta__ = {
@@ -135,10 +135,10 @@ limit_right = 3680
 visible = false
 
 [node name="AnimationTree" parent="Player" index="5"]
-parameters/playback = SubResource( 1 )
+parameters/playback = SubResource( 3 )
 
 [node name="Portal2D" parent="." instance=ExtResource( 6 )]
-position = Vector2( 4181.42, 711.3 )
+position = Vector2( 4181.02, 711.3 )
 next_scene = ExtResource( 7 )
 
 [node name="Weather" parent="." instance=ExtResource( 3 )]
@@ -147,96 +147,12 @@ weatherType = "clear"
 wind = 0.0
 size = 0.0
 
-[node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
-margin_left = 149.568
-margin_top = 182.432
-margin_right = 186.568
-margin_bottom = 250.432
-weatherType = "snow"
-wind = -0.297
-
-[node name="WeatherControl5" parent="." instance=ExtResource( 5 )]
-margin_left = 347.46
-margin_top = 184.547
-margin_right = 453.46
-margin_bottom = 252.547
-weatherType = "clear"
-size = 0.0
-
-[node name="WeatherControl3" parent="." instance=ExtResource( 5 )]
-margin_left = 305.0
-margin_top = 43.0
-margin_right = 386.0
-margin_bottom = 78.0
-weatherType = "snow"
-wind = -0.481
-size = 0.735
-
 [node name="WeatherControl" parent="." instance=ExtResource( 5 )]
-margin_left = 140.0
-margin_top = -172.0
-margin_right = 340.0
-margin_bottom = -93.0
-weatherType = "snow"
-wind = -0.762
-size = 1.0
-
-[node name="WeatherControl4" parent="." instance=ExtResource( 5 )]
-margin_left = 588.0
-margin_top = 189.0
-margin_right = 813.0
-margin_bottom = 250.0
-weatherType = "rain"
-wind = 0.395
-size = 0.735
-
-[node name="WeatherControl10" parent="." instance=ExtResource( 5 )]
-margin_left = 817.0
-margin_top = 223.0
-margin_right = 1049.0
-margin_bottom = 255.0
-weatherType = "clear"
-wind = 0.5
-size = 0.1
-amount = 3000
-
-[node name="WeatherControl6" parent="." instance=ExtResource( 5 )]
-margin_left = 1077.0
-margin_top = 193.0
-margin_right = 1277.0
-margin_bottom = 254.0
-weatherType = "snow"
+position = Vector2( -70.25, 14.5 )
 wind = 1.0
-size = 1.0
-amount = 3000
-lightChangeTime = 10.0
-delayWeatherChange = false
-weatherChangeTime = 30.0
+areaSize = Vector2( 50, 30 )
 
-[node name="WeatherControl7" parent="." instance=ExtResource( 5 )]
-margin_left = 458.0
-margin_top = -125.0
-margin_right = 531.0
-margin_bottom = -64.0
-weatherType = "rain"
-wind = 0.531
-size = 1.0
-
-[node name="WeatherControl9" parent="." instance=ExtResource( 5 )]
-margin_left = 796.881
-margin_top = -304.535
-margin_right = 835.881
-margin_bottom = -269.535
-weatherType = "rain"
-wind = -1.0
-size = 1.0
-
-[node name="WeatherControl8" parent="." instance=ExtResource( 5 )]
-margin_left = 289.0
-margin_top = -363.0
-margin_right = 405.0
-margin_bottom = -302.0
-weatherType = "snow"
-wind = -0.182
+[node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
+position = Vector2( -92.4967, 60.7193 )
 
 [editable path="Player"]
