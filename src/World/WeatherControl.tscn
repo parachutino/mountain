@@ -6,6 +6,7 @@
 extents = Vector2( 20, 20 )
 
 [node name="WeatherControl" type="Control"]
+modulate = Color( 0, 1, 0, 1 )
 margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 1 )

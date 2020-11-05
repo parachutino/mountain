@@ -86,6 +86,10 @@ pause={
 2d_physics/layer_4="world"
 2d_physics/player=false
 
+[memory]
+
+limits/message_queue/max_size_kb=4096
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

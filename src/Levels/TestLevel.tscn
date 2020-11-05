@@ -51,9 +51,6 @@ tile_data = PoolIntArray( -1900526, 1, 1, -1900525, 1, 5, -1900523, 1, 1, -19005
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 30, 250 )
 
-[node name="player" parent="Player" index="0"]
-frame = 1
-
 [node name="CollisionShape2D" parent="Player" index="1"]
 visible = false
 
