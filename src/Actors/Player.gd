@@ -27,7 +27,7 @@ var wind: float = 0
 
 var _velocity: = Vector2.ZERO
 var _acceleration: = 0.25
-var modified_speed: Vector2 = speed
+var _modified_speed: Vector2 = speed
 
 var terrain = ""
 var last_terrain = "normal"
@@ -51,11 +51,11 @@ func _on_EnemyDetector_body_entered(_body):
 	
 func weather_changed(new_weather):
 	weather = new_weather
-	calculate_modified_speed()
+	_modified_speed = calculate_modified_speed()
 	
 func weatherSize_changed(new_weatherSize):
 	weatherSize = new_weatherSize
-	calculate_modified_speed()
+	_modified_speed = calculate_modified_speed()
 
 # Esta funcion se ejecuta y ejecuta la misma funcion del padre una vez por physic frame....
 func _physics_process(_delta: float) -> void:
@@ -67,16 +67,57 @@ func _physics_process(_delta: float) -> void:
 	_acceleration = set_acceleration() # Defines aceleration based on terrain
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
-	_velocity = calculate_move_velocity(_velocity, direction, modified_speed, is_jump_interrupted)
+	_velocity = calculate_move_velocity(_velocity, direction, _modified_speed, is_jump_interrupted)
 	
 	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
 		# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
 		# Se podria usar solo el metodo move_and_slide, pero al llegar al fin de una plataforma caeria bruscamente.
 	_velocity = move_and_slide(_velocity, FLOOR_NORMAL,
 								false, 4,
-								PI/3, # Slope Angle... standard = PI/4
+								1.3, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
+
+
+func calculate_move_velocity(
+		linear_velocity: Vector2,
+		direction: Vector2,
+		spd: Vector2,
+		is_jump_interrupted: bool
+	) -> Vector2:
+		
+	var new_velocity: = linear_velocity
+	var floor_normal = get_floor_normal()
+	
+	# new_velocity.x = spd.x * direction.x
+	new_velocity.x = spd.x * (direction.x + floor_normal.x/2) # TERRAIN ANGLE AFFECTS SPEED
+	
+	"""EASY WIND"""
+	if (abs(wind) - windResistance) > 0:
+		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
+	"""---------"""
+	
+	
+	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> _acceleration = 0.05 aconsejado
+	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
+	
+	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
+	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
+	"""-----------------------"""
+ 
+	# SALTO (IMPORTANTE: DELTA) 
+	new_velocity.y += gravity * get_physics_process_delta_time()
+	if direction.y == -1.0:
+		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
+		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
+		new_velocity.x = new_velocity.x + spd.x * floor_normal.x # Apply floor normal to jump in x
+	
+	if is_jump_interrupted:
+		new_velocity.y = sqrt(spd.y)
+	
+
+	return new_velocity
+
 
 
 
@@ -103,9 +144,6 @@ func set_acceleration():
 	
 	var accel = terrainAcceleration[get_tile_type()]
 	
-	# TERRAIN ANGLE AFFECTS ACCELERATION
-	# accel = accel * (1 + get_floor_normal().x) # NO!!
-	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
 		accel = accel * (1 - weatherSize * rainResistance)
@@ -114,53 +152,18 @@ func set_acceleration():
 	return accel
 
 
-
-func calculate_move_velocity(
-		linear_velocity: Vector2,
-		direction: Vector2,
-		spd: Vector2,
-		is_jump_interrupted: bool
-	) -> Vector2:
-		
-	var new_velocity: = linear_velocity
-	new_velocity.x = spd.x * direction.x
-	
-	"""EASY WIND"""
-	if (abs(wind) - windResistance) > 0:
-		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
-	"""---------"""
-	
-	
-	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> _acceleration = 0.05 aconsejado
-	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
-	
-	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
-	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
-	"""-----------------------"""
- 
-	# SALTO (IMPORTANTE: DELTA) 
-	new_velocity.y += gravity * get_physics_process_delta_time()
-	if direction.y == -1.0:
-		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
-		new_velocity.y = spd.y * get_floor_normal().y # Apply floor normal to jump
-		new_velocity.x = new_velocity.x + spd.x * get_floor_normal().x # Apply floor normal to jump in x
-	
-	if is_jump_interrupted:
-		new_velocity.y = sqrt(spd.y)
-	
-
-	return new_velocity
-
-
 func calculate_modified_speed():
+	var last_speed = _modified_speed #DEBUG SPEED
+	var new_speed = last_speed
+	
 	if weather == "snow":
 		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
-		modified_speed.x = speed.x * (1 - weatherSize * snowResistance)
-	else: modified_speed.x = speed.x
-	# print_debug("Speed: ", speed, " / Modified Speed: ", modified_speed)
-	
-	# TERRAIN ANGLE AFFECTS X.SPEED
-	modified_speed.x = modified_speed.x + gravity * get_floor_normal().x
+		new_speed.x = speed.x * (1 - weatherSize * snowResistance)
+	else: new_speed.x = speed.x
+	# print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
+
+	return new_speed
+
 
 func get_tile_type(): #sets terrain variable and returns tile_type
 	var current_tile

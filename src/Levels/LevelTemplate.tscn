@@ -115,8 +115,8 @@ __meta__ = {
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 32, 248 )
 
-[node name="CollisionShape2D" parent="Player" index="1"]
-visible = false
+[node name="player" parent="Player" index="0"]
+frame = 0
 
 [node name="Camera2D" parent="Player" index="2"]
 position = Vector2( 0, -70 )
