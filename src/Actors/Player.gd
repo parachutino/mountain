@@ -110,18 +110,11 @@ func calculate_move_velocity(
 		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
 		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
 		
-		"""Tentando di migliorare salto... SCARTATO"""
+		"""JUMP gets more impulse or less penalty in X from FLOOR NORMAL depending on floor acceleration"""
 		# print_debug("Velocidad: ",new_velocity.x)
-		
-		# new_velocity.x = 0
-		# new_velocity.x = new_velocity.x * (1.25 - abs(floor_normal.x)) * terrainAcceleration[get_tile_type()] # Apply floor normal to jump in x
-		# new_velocity.x = new_velocity.x * (1 + floor_normal.x * (terrainAcceleration[get_tile_type()]-1)) # Apply floor normal to jump in x
-		# new_velocity.x = new_velocity.x * (_acceleration) # Apply floor normal to jump in x
-		# new_velocity.x = new_velocity.x * terrainAcceleration[get_tile_type()] # Apply floor normal to jump in x
-		# new_velocity.x = new_velocity.x + spd.x * floor_normal.x * 1.25 * (0.25-terrainAcceleration[get_tile_type()]) # Apply floor normal to jump in x
-		
-		### THIS FORMULA WORKS BEST, BUT... it breaks you more if you have more grip)...
-		### new_velocity.x = new_velocity.x + spd.x * floor_normal.x * _acceleration # Apply floor normal to jump in x
+		new_velocity.x += spd.x * floor_normal.x * -direction.x * _acceleration
+		# print_debug(100, " + ", 100 * floor_normal.x * -direction.x * _acceleration)
+		# print_debug(new_velocity.x, " + ", spd.x * floor_normal.x * -direction.x * _acceleration)
 		# print_debug("Floor Normal: ",floor_normal)
 		# print_debug("Salto: ",new_velocity.x)
 		"""..."""
