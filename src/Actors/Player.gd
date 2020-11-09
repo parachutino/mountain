@@ -14,7 +14,17 @@ export var terrainAcceleration = {
 	"unknown" : 0.25,
 	"grass" : 0.25,
 	"stone" : 0.1,
-	"ice": 0.02
+	"ice": 0.02,
+	"snow": 0.5
+	}
+
+var terrainSpeed = {
+	"air" : Vector2(1, 1),
+	"unknown" : Vector2(1, 1),
+	"grass" : Vector2(1, 1),
+	"stone" : Vector2(1, 1),
+	"ice": Vector2(1, 1),
+	"snow": Vector2(0.5, 0.5)
 	}
 
 export (float, 0, 1) var windResistance = 0.3
@@ -36,9 +46,75 @@ var player_tile_position: Vector2
 var state_machine
 var player
 
+# Store default variables for in-game calculations... check _set_default_variables() function
+var default_speed
+var default_gravity
+var default_terrainAcceleration
+var default_terrainSpeed
+var default_windResistance
+var default_rainResistance
+var default_snowResistance
+
+# Modifiers for stats
+var speed_modifier = Vector2(1, 1) # DEFAULT 1
+var gravity_modifier = 1.0 # DEFAULT 1
+var terrainAcceleration_modifier: Dictionary
+var terrainSpeed_modifier: Dictionary
+var windResistance_modifier = 0.0 # DEFAULT 0
+var rainResistance_modifier = 0.0 # DEFAULT 0
+var snowResistance_modifier = 0.0 # DEFAULT 0
+
+
 func _ready():
 	state_machine = $AnimationTree.get("parameters/playback")
 	player = $player
+	_set_default_stats()
+	recalculate_stats()
+
+
+func _set_default_stats():
+	
+	# Store default values from Public variables
+	default_speed = speed
+	default_gravity = gravity
+	default_terrainAcceleration = terrainAcceleration.duplicate()
+	default_terrainSpeed = terrainSpeed.duplicate()
+	default_windResistance = windResistance
+	default_rainResistance = rainResistance
+	default_snowResistance = snowResistance
+	
+	# Create terrain speed and acceleration modifiers
+	terrainAcceleration_modifier = terrainAcceleration.duplicate()
+	terrainSpeed_modifier = terrainSpeed.duplicate()
+	
+	for modifier in terrainAcceleration_modifier:
+		modifier = 0.0
+	
+	for modifier in terrainSpeed_modifier:
+		modifier = 0.0
+
+
+func recalculate_stats():
+	print_debug("Recalculating stats...")
+	# SPEED:
+	speed = default_speed * speed_modifier
+	# GRAVITY:
+	gravity = default_gravity * gravity_modifier
+	# TERRAIN ACCELERATION:
+
+	for acceleration_modifier in terrainAcceleration:
+		terrainAcceleration[acceleration_modifier] = default_terrainAcceleration[acceleration_modifier] + terrainAcceleration_modifier[acceleration_modifier]
+		print_debug(default_terrainAcceleration[acceleration_modifier], terrainAcceleration_modifier[acceleration_modifier])
+	# TERRAIN SPEED:
+	for speed_modifier in terrainSpeed:
+		terrainSpeed[speed_modifier] = default_terrainSpeed[speed_modifier] + terrainSpeed_modifier[speed_modifier]
+	# WIND RESISTANCE:
+	windResistance = default_windResistance + windResistance_modifier
+	# RAIN RESISTANCE:
+	rainResistance = default_windResistance + windResistance_modifier
+	# SNOW RESISTANCE:
+	snowResistance = default_snowResistance + snowResistance_modifier
+	
 
 # Hace saltar al Player cuando un AREA2D entra en la zona especificada
 func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
@@ -195,7 +271,6 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 	
 	terrain = current_tile
 	return current_tile
-
 
 
 # Calculates jump velocity
