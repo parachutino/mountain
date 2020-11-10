@@ -56,88 +56,24 @@ var default_rainResistance
 var default_snowResistance
 
 # Modifiers for stats
-var speed_modifier = Vector2(1, 1) # DEFAULT 1
-var gravity_modifier = 1.0 # DEFAULT 1
-var terrainAcceleration_modifier: Dictionary
-var terrainSpeed_modifier: Dictionary
-var windResistance_modifier = 0.0 # DEFAULT 0
-var rainResistance_modifier = 0.0 # DEFAULT 0
-var snowResistance_modifier = 0.0 # DEFAULT 0
+var speed_modifier # DEFAULT (1, 1)
+var gravity_modifier # DEFAULT 1
+var windResistance_modifier # DEFAULT 0
+var rainResistance_modifier # DEFAULT 0
+var snowResistance_modifier # DEFAULT 0
+onready var terrainAcceleration_modifier = terrainAcceleration.duplicate()
+onready var terrainSpeed_modifier = terrainSpeed.duplicate()
 
 
 func _ready():
 	state_machine = $AnimationTree.get("parameters/playback")
 	player = $player
-	_set_default_stats()
-	recalculate_stats()
+	set_default_stats()
+	calculate_stats()
 
 
-func _set_default_stats():
-	
-	# Store default values from Public variables
-	default_speed = speed
-	default_gravity = gravity
-	default_terrainAcceleration = terrainAcceleration.duplicate()
-	default_terrainSpeed = terrainSpeed.duplicate()
-	default_windResistance = windResistance
-	default_rainResistance = rainResistance
-	default_snowResistance = snowResistance
-	
-	# Create terrain speed and acceleration modifiers
-	terrainAcceleration_modifier = terrainAcceleration.duplicate()
-	terrainSpeed_modifier = terrainSpeed.duplicate()
-	
-	for modifier in terrainAcceleration_modifier:
-		modifier = 0.0
-	
-	for modifier in terrainSpeed_modifier:
-		modifier = 0.0
-
-
-func recalculate_stats():
-	print_debug("Recalculating stats...")
-	# SPEED:
-	speed = default_speed * speed_modifier
-	# GRAVITY:
-	gravity = default_gravity * gravity_modifier
-	# TERRAIN ACCELERATION:
-
-	for acceleration_modifier in terrainAcceleration:
-		terrainAcceleration[acceleration_modifier] = default_terrainAcceleration[acceleration_modifier] + terrainAcceleration_modifier[acceleration_modifier]
-		print_debug(default_terrainAcceleration[acceleration_modifier], terrainAcceleration_modifier[acceleration_modifier])
-	# TERRAIN SPEED:
-	for speed_modifier in terrainSpeed:
-		terrainSpeed[speed_modifier] = default_terrainSpeed[speed_modifier] + terrainSpeed_modifier[speed_modifier]
-	# WIND RESISTANCE:
-	windResistance = default_windResistance + windResistance_modifier
-	# RAIN RESISTANCE:
-	rainResistance = default_windResistance + windResistance_modifier
-	# SNOW RESISTANCE:
-	snowResistance = default_snowResistance + snowResistance_modifier
-	
-
-# Hace saltar al Player cuando un AREA2D entra en la zona especificada
-func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
-	_velocity = calculate_stomp_velocity(_velocity, stomp_impulse)
-	
-# Mata al Player cuando un BODY entra en la zona especificada
-func _on_EnemyDetector_body_entered(_body):
-	# Mata al player
-	die()
-	
-func weather_changed(new_weather):
-	weather = new_weather
-	_modified_speed = calculate_modified_speed()
-	
-func weatherSize_changed(new_weatherSize):
-	weatherSize = new_weatherSize
-	_modified_speed = calculate_modified_speed()
-
-# Esta funcion se ejecuta y ejecuta la misma funcion del padre una vez por physic frame....
 func _physics_process(_delta: float) -> void:
 		
-		
-
 	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0 # Interrupts jump if button released
 	var direction: = get_direction() # Gets input from keyboard / joystick
 	_acceleration = set_acceleration() # Defines aceleration based on terrain
@@ -154,6 +90,100 @@ func _physics_process(_delta: float) -> void:
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
 
+"""EXTERNAL CALLED FUNCTIONS"""
+func weather_changed(new_weather):
+	weather = new_weather
+	_modified_speed = calculate_modified_speed()
+
+func weatherSize_changed(new_weatherSize):
+	weatherSize = new_weatherSize
+	_modified_speed = calculate_modified_speed()
+
+# Hace saltar al Player cuando un AREA2D entra en la zona especificada
+func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
+	_velocity = calculate_stomp_velocity(_velocity, stomp_impulse)
+
+# Mata al Player cuando un BODY entra en la zona especificada
+func _on_EnemyDetector_body_entered(_body):
+	# Mata al player
+	die()
+
+"""STATS FUNCTIONS"""
+func set_default_stats():
+	
+	# Store default values from Public variables
+	default_speed = speed
+	default_gravity = gravity
+	default_windResistance = windResistance
+	default_rainResistance = rainResistance
+	default_snowResistance = snowResistance
+	default_terrainAcceleration = terrainAcceleration.duplicate()
+	default_terrainSpeed = terrainSpeed.duplicate()
+
+
+func reset_stats():
+	
+	# RESET Main
+	speed = default_speed
+	gravity = default_gravity
+	windResistance = default_windResistance
+	rainResistance = default_rainResistance
+	snowResistance = default_snowResistance
+	
+	# RESET Terrain Stats
+	for type in terrainAcceleration:
+		terrainAcceleration[type] = default_terrainAcceleration[type]
+	for type in terrainAcceleration:
+		terrainAcceleration[type] = default_terrainAcceleration[type]
+	
+	# RESET Main Modifiers
+	speed_modifier = Vector2(1, 1) # DEFAULT (1, 1)
+	gravity_modifier = 1.0 # DEFAULT 1
+	windResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.3)
+	rainResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.5)
+	snowResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.5)
+	
+	# RESET Terrain Modifiers
+	for modifier in terrainAcceleration_modifier:
+		modifier = 0.0
+	for modifier in terrainSpeed_modifier:
+		modifier = 0.0
+
+
+func calculate_stats():
+	# print_debug("Recalculating stats...")
+	
+	reset_stats()
+	
+	# SPEED:
+	speed = default_speed * speed_modifier
+	# GRAVITY:
+	gravity = default_gravity * gravity_modifier
+
+	# WIND RESISTANCE:
+	windResistance = default_windResistance + windResistance_modifier
+	if windResistance < 0: windResistance = 0 # LOW LIMIT
+	elif windResistance > 1: windResistance = 1 # HIGH LIMIT
+	# RAIN RESISTANCE:
+	rainResistance = default_windResistance + windResistance_modifier
+	if rainResistance < 0: rainResistance = 0 # LOW LIMIT
+	elif rainResistance > 1: rainResistance = 1 # HIGH LIMIT
+	# SNOW RESISTANCE:
+	snowResistance = default_snowResistance + snowResistance_modifier
+	if snowResistance < 0: snowResistance = 0 # LOW LIMIT
+	elif snowResistance > 1: snowResistance = 1 # HIGH LIMIT
+	
+	# TERRAIN ACCELERATION:
+	for modifier in terrainAcceleration:
+		terrainAcceleration[modifier] = default_terrainAcceleration[modifier] + terrainAcceleration_modifier[modifier]
+		if terrainAcceleration[modifier] < 0: terrainAcceleration = 0 # LOW LIMIT
+		elif terrainAcceleration[modifier] > 1: terrainAcceleration = 1 # HIGH LIMIT
+	# TERRAIN SPEED:
+	for modifier in terrainSpeed:
+		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
+
+
+"""MOVEMENT FUNCTIONS"""
 
 func calculate_move_velocity(
 		linear_velocity: Vector2,
@@ -168,19 +198,15 @@ func calculate_move_velocity(
 	# new_velocity.x = spd.x * direction.x
 	new_velocity.x = spd.x * (direction.x + floor_normal.x/2) # TERRAIN ANGLE AFFECTS SPEED
 	
-	"""EASY WIND"""
+	# WIND
 	if (abs(wind) - windResistance) > 0:
 		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
 	"""---------"""
 	
-	# ACCEL v3.0 vBY DIEGO Aplica una "aceleración" proporcional al cambio de velocidad... Variable publica: -> _acceleration = 0.05 aconsejado
+	# ACCELERATION: Gradually accelerate / brake
 	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
-	
-	"""TRUE WIND... TOO STRONG (REPLACED WITH EASY WIND)"""
-	# if (wind - windResistance) > 0: new_velocity.x += speed.x * (wind - windResistance)
-	"""-----------------------"""
  
-	# SALTO (IMPORTANTE: DELTA) 
+	# JUMP (IMPORTANT: DELTA) 
 	new_velocity.y += gravity * get_physics_process_delta_time()
 	if direction.y == -1.0:
 		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
@@ -200,6 +226,7 @@ func calculate_move_velocity(
 
 	return new_velocity
 
+
 func get_direction() -> Vector2:
 	var dir = Vector2(	
 		# La dirección en X será 1 si aprieta derecha y -1 si aprieta izquierda
@@ -207,15 +234,18 @@ func get_direction() -> Vector2:
 		-1.0 if Input.is_action_just_pressed("jump") and is_on_floor() else 1.0
 		)
 	
+	# DEBUG JUMP
+	# if Input.is_action_just_pressed("jump") and not is_on_floor(): print_debug("NOT ON FLOOR!!")
+	
 	if dir.x > 0: player.scale.x = -1
 	elif dir.x < 0: player.scale.x = 1
-
+	
 	if is_on_floor():
 		if dir.x == 0: state_machine.travel("idle")
 		else: state_machine.travel("run")
 	
 	else: state_machine.travel("run")
-
+	
 	return dir
 
 
@@ -238,7 +268,7 @@ func calculate_modified_speed():
 	if weather == "snow":
 		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
 		new_speed.x = speed.x * (1 - weatherSize * snowResistance)
-	else: new_speed.x = speed.x
+	else: new_speed.x = speed.x 
 	# print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
 
 	return new_speed
