@@ -8,6 +8,10 @@ export var speed: = Vector2(200.0, 350.0)
 export var gravity: = 1000.0
 export var stomp_impulse = 1000.0
 
+export (float, 0, 1) var windResistance = 0.3
+export (float, 0, 1) var rainResistance = 0.5
+export (float, 0, 1) var snowResistance = 0.5
+
 # Da inercia al movimiento (by Diego)
 export var terrainAcceleration = {
 	"air" : 0.02,
@@ -18,7 +22,7 @@ export var terrainAcceleration = {
 	"snow": 0.5
 	}
 
-var terrainSpeed = {
+export var terrainSpeed = {
 	"air" : Vector2(1, 1),
 	"unknown" : Vector2(1, 1),
 	"grass" : Vector2(1, 1),
@@ -27,9 +31,6 @@ var terrainSpeed = {
 	"snow": Vector2(0.5, 0.5)
 	}
 
-export (float, 0, 1) var windResistance = 0.3
-export (float, 0, 1) var rainResistance = 0.5
-export (float, 0, 1) var snowResistance = 0.5
 
 var weather = 'clear' setget weather_changed
 var weatherSize: float = 0 setget weatherSize_changed
@@ -56,13 +57,13 @@ var default_terrainAcceleration
 var default_terrainSpeed
 
 # Modifiers for stats
-var speed_modifier # DEFAULT (1, 1)
-var gravity_modifier # DEFAULT 1
-var windResistance_modifier # DEFAULT 0
-var rainResistance_modifier # DEFAULT 0
-var snowResistance_modifier # DEFAULT 0
-onready var terrainAcceleration_modifier = terrainAcceleration.duplicate()
-onready var terrainSpeed_modifier = terrainSpeed.duplicate()
+var speed_modifier # DEFAULT (1, 1) : Multiplied by speed
+var gravity_modifier # DEFAULT 1 : Multiplied by Gravity
+var windResistance_modifier # DEFAULT 0 : Added to resistance
+var rainResistance_modifier # DEFAULT 0 : Added to resistance
+var snowResistance_modifier # DEFAULT 0 : Added to resistance
+onready var terrainAcceleration_modifier = terrainAcceleration.duplicate() # DEFAULT 0 : Added to terrainAcceleration
+onready var terrainSpeed_modifier = terrainSpeed.duplicate() # DEFAULT 0 : Added to terrainSpeed
 
 
 func _ready():
@@ -96,29 +97,11 @@ func _physics_process(_delta: float) -> void:
 								)
 
 
-"""EXTERNAL CALLED FUNCTIONS"""
-func weather_changed(new_weather):
-	weather = new_weather
-	_modified_speed = calculate_modified_speed()
-
-func weatherSize_changed(new_weatherSize):
-	weatherSize = new_weatherSize
-	_modified_speed = calculate_modified_speed()
-
-# Hace saltar al Player cuando un AREA2D entra en la zona especificada
-func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
-	_velocity = calculate_stomp_velocity(_velocity, stomp_impulse)
-
-# Mata al Player cuando un BODY entra en la zona especificada
-func _on_EnemyDetector_body_entered(_body):
-	# Mata al player
-	die()
-
 
 """STATS FUNCTIONS"""
 func set_default_stats():
 	
-	# Store default values from Public variables
+	# Store stats default values from public variables
 	default_speed = speed
 	default_gravity = gravity
 	default_windResistance = windResistance
@@ -162,8 +145,6 @@ func calculate_stats():
 	# print_debug("Recalculating stats...")
 	
 	reset_stats()
-	
-	terrainSpeed_modifier["grass"] = Vector2(-0.5, 0)
 	
 	# SPEED:
 	speed = default_speed * speed_modifier
@@ -277,7 +258,7 @@ func calculate_modified_speed():
 	
 	# APPLY SPEED MODIFIER
 	# print_debug(terrainSpeed_modifier[terrain])
-	new_speed = speed * speed_modifier * terrainSpeed[terrain]
+	new_speed = speed * terrainSpeed[terrain]
 	# print_debug(new_speed)
 	
 	# SNOW SPEED MODIFIER
@@ -314,9 +295,9 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 				if current_tile == "unknown": #DEBUG ERROR if Tile is unknown
 					print_debug("Unknown tile type. Check tile name in scene's TileMap and terrainAcceleration Dictionary in Player")
 				# DEBUG tile position and type
-				print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
+				# print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
 				# print_debug(_acceleration)
-				print_debug(_modified_speed)
+				# print_debug(_modified_speed)
 				
 	else: current_tile = "air" # Acceleration on air
 	
@@ -335,3 +316,23 @@ func die() -> void:
 	queue_free()
 	PlayerData.deaths += 1
 
+
+"""SETGET FUNCTIONS"""
+func weather_changed(new_weather):
+	weather = new_weather
+	_modified_speed = calculate_modified_speed()
+
+func weatherSize_changed(new_weatherSize):
+	weatherSize = new_weatherSize
+	_modified_speed = calculate_modified_speed()
+
+
+"""SIGNAL FUNCTIONS"""
+# Hace saltar al Player cuando un AREA2D entra en la zona especificada
+func _on_EnemyDetector_area_entered(_area: Area2D) -> void:
+	_velocity = calculate_stomp_velocity(_velocity, stomp_impulse)
+
+# Mata al Player cuando un BODY entra en la zona especificada
+func _on_EnemyDetector_body_entered(_body):
+	# Mata al player
+	die()
