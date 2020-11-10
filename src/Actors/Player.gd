@@ -49,11 +49,11 @@ var player
 # Store default variables for in-game calculations... check _set_default_variables() function
 var default_speed
 var default_gravity
-var default_terrainAcceleration
-var default_terrainSpeed
 var default_windResistance
 var default_rainResistance
 var default_snowResistance
+var default_terrainAcceleration
+var default_terrainSpeed
 
 # Modifiers for stats
 var speed_modifier # DEFAULT (1, 1)
@@ -76,6 +76,11 @@ func _physics_process(_delta: float) -> void:
 		
 	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0 # Interrupts jump if button released
 	var direction: = get_direction() # Gets input from keyboard / joystick
+	
+	get_tile_type()
+	
+	if last_terrain != terrain: _modified_speed = calculate_modified_speed()
+	
 	_acceleration = set_acceleration() # Defines aceleration based on terrain
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
@@ -89,6 +94,7 @@ func _physics_process(_delta: float) -> void:
 								1.3, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
+
 
 """EXTERNAL CALLED FUNCTIONS"""
 func weather_changed(new_weather):
@@ -108,6 +114,7 @@ func _on_EnemyDetector_body_entered(_body):
 	# Mata al player
 	die()
 
+
 """STATS FUNCTIONS"""
 func set_default_stats():
 	
@@ -119,6 +126,7 @@ func set_default_stats():
 	default_snowResistance = snowResistance
 	default_terrainAcceleration = terrainAcceleration.duplicate()
 	default_terrainSpeed = terrainSpeed.duplicate()
+
 
 
 func reset_stats():
@@ -133,8 +141,8 @@ func reset_stats():
 	# RESET Terrain Stats
 	for type in terrainAcceleration:
 		terrainAcceleration[type] = default_terrainAcceleration[type]
-	for type in terrainAcceleration:
-		terrainAcceleration[type] = default_terrainAcceleration[type]
+	for type in terrainSpeed:
+		terrainSpeed[type] = default_terrainSpeed[type]
 	
 	# RESET Main Modifiers
 	speed_modifier = Vector2(1, 1) # DEFAULT (1, 1)
@@ -145,15 +153,17 @@ func reset_stats():
 	
 	# RESET Terrain Modifiers
 	for modifier in terrainAcceleration_modifier:
-		modifier = 0.0
+		terrainAcceleration_modifier[modifier] = 0 # DEFAULT 0
 	for modifier in terrainSpeed_modifier:
-		modifier = 0.0
+		terrainSpeed_modifier[modifier] = Vector2(0, 0) # DEFAULT (0, 0)
 
 
 func calculate_stats():
 	# print_debug("Recalculating stats...")
 	
 	reset_stats()
+	
+	terrainSpeed_modifier["grass"] = Vector2(-0.5, 0)
 	
 	# SPEED:
 	speed = default_speed * speed_modifier
@@ -251,7 +261,7 @@ func get_direction() -> Vector2:
 
 func set_acceleration():
 	
-	var accel = terrainAcceleration[get_tile_type()]
+	var accel = terrainAcceleration[terrain]
 	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
@@ -265,10 +275,16 @@ func calculate_modified_speed():
 	var last_speed = _modified_speed #DEBUG SPEED
 	var new_speed = last_speed
 	
+	# APPLY SPEED MODIFIER
+	# print_debug(terrainSpeed_modifier[terrain])
+	new_speed = speed * speed_modifier * terrainSpeed[terrain]
+	# print_debug(new_speed)
+	
+	# SNOW SPEED MODIFIER
 	if weather == "snow":
 		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
-		new_speed.x = speed.x * (1 - weatherSize * snowResistance)
-	else: new_speed.x = speed.x 
+		new_speed.x = new_speed.x * (1 - weatherSize * snowResistance)
+
 	# print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
 
 	return new_speed
@@ -276,6 +292,9 @@ func calculate_modified_speed():
 
 func get_tile_type(): #sets terrain variable and returns tile_type
 	var current_tile
+	
+	last_terrain = terrain
+	
 	if is_on_floor():
 		var collision = get_slide_collision(0)
 		if collision.collider is TileMap:
@@ -295,7 +314,9 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 				if current_tile == "unknown": #DEBUG ERROR if Tile is unknown
 					print_debug("Unknown tile type. Check tile name in scene's TileMap and terrainAcceleration Dictionary in Player")
 				# DEBUG tile position and type
-				# print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
+				print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
+				# print_debug(_acceleration)
+				print_debug(_modified_speed)
 				
 	else: current_tile = "air" # Acceleration on air
 	
