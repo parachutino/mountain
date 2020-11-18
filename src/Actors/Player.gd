@@ -79,6 +79,8 @@ func _ready():
 	set_default_stats()
 	calculate_stats()
 
+func _process(delta: float) -> void:
+	temp_UI()
 
 func _physics_process(_delta: float) -> void:
 		
@@ -104,6 +106,37 @@ func _physics_process(_delta: float) -> void:
 								1.3, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
+
+
+
+func temp_UI(): # UI TEMPORANEA CON TASTIERA E JOYSTICK
+	
+	# KEYBOARD TYUI GHJK
+	if Input.is_action_just_pressed("select_shoes_0"): inventory.shoes = inventory.shoesInventory[0]
+	if Input.is_action_just_pressed("select_shoes_1"): inventory.shoes = inventory.shoesInventory[1]
+	if Input.is_action_just_pressed("select_shoes_2"): inventory.shoes = inventory.shoesInventory[2]
+	if Input.is_action_just_pressed("select_shoes_3"): inventory.shoes = inventory.shoesInventory[3]
+	if Input.is_action_just_pressed("select_accesory_0"): inventory.accesory = inventory.accesoryInventory[0]
+	if Input.is_action_just_pressed("select_accesory_1"): inventory.accesory = inventory.accesoryInventory[1]
+	if Input.is_action_just_pressed("select_accesory_2"): inventory.accesory = inventory.accesoryInventory[2]
+	if Input.is_action_just_pressed("select_accesory_3"): inventory.accesory = inventory.accesoryInventory[3]
+	
+	# JOYSTICK Right Stick
+	var select = Vector2(
+		int(Input.get_action_strength("select_right")-Input.get_action_strength("select_left")),
+		int(Input.get_action_strength("select_up")-Input.get_action_strength("select_down"))
+		)
+	print_debug(select)
+	
+	# KEYBOARD TYUI GHJK
+	if select == Vector2(-1,0): inventory.shoes = inventory.shoesInventory[0]
+	if select == Vector2(-1,1): inventory.shoes = inventory.shoesInventory[1]
+	if select == Vector2(0,1): inventory.shoes = inventory.shoesInventory[2]
+	if select == Vector2(1,1): inventory.shoes = inventory.shoesInventory[3]
+	if select == Vector2(1,0): inventory.accesory = inventory.accesoryInventory[0]
+	if select == Vector2(1,-1): inventory.accesory = inventory.accesoryInventory[1]
+	if select == Vector2(0,-1): inventory.accesory = inventory.accesoryInventory[2]
+	if select == Vector2(-1,-1): inventory.accesory = inventory.accesoryInventory[3]
 
 
 

@@ -14,13 +14,14 @@ export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets") onr
 export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
 
 var shoesInventory = ["Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets"]
-var toolsInventory =  ["Nothing", "Rain Coat", "Jumping Tool", "Guorren's Cape"]
+var accesoryInventory =  ["Nothing", "Rain Coat", "Jumping Tool", "Parachute"]
 
 var item: Dictionary 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_generate_item_list()
+
 
 class player_item:
 	
