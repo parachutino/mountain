@@ -24,7 +24,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	
 	if Engine.editor_hint: # Solo funziona in "Editor", non durante il gioco...
-		var collisionShape2D = $Area2D/CollisionShape2D
+		var collisionShape2D = $Area2D/CollisionShape2D # UNNECESARY... already defined
 		_control_Area2D_shape(collisionShape2D)
 
 

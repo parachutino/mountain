@@ -3,14 +3,21 @@ class_name Player
 
 const FLOOR_NORMAL: = Vector2.UP
 
+onready var state_machine = $AnimationTree.get("parameters/playback")
+onready var player = $player
+onready var inventory = $Inventory
+
+export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
+export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
+
 # Define MAX velocidad en X y en Y...
 export var speed: = Vector2(200.0, 350.0)
 export var gravity: = 1000.0
 export var stomp_impulse = 1000.0
 
 export (float, 0, 1) var windResistance = 0.3
-export (float, 0, 1) var rainResistance = 0.5
-export (float, 0, 1) var snowResistance = 0.5
+export (float, 0, 1) var rainResistance = 0.4
+export (float, 0, 1) var snowResistance = 0.4
 
 # Da inercia al movimiento (by Diego)
 export var terrainAcceleration: Dictionary = {
@@ -44,31 +51,27 @@ var terrain: String = ""
 var last_terrain: String = "normal"
 var player_tile_position: Vector2
 
-var state_machine
-var player
-
 # Store default variables for in-game calculations... check _set_default_variables() function
 var default_speed: Vector2
 var default_gravity: float
 var default_windResistance: float
 var default_rainResistance: float
 var default_snowResistance: float
-var default_terrainAcceleration: Dictionary
-var default_terrainSpeed: Dictionary
+var default_terrainAcceleration: Dictionary = terrainAcceleration.duplicate()
+var default_terrainSpeed: Dictionary = terrainSpeed.duplicate()
 
 # Modifiers for stats
 var speed_modifier: Vector2 # DEFAULT (1, 1) : Multiplied by speed
+var acceleration_modifier: float
 var gravity_modifier: float # DEFAULT 1 : Multiplied by Gravity
 var windResistance_modifier: float # DEFAULT 0 : Added to resistance
 var rainResistance_modifier: float # DEFAULT 0 : Added to resistance
 var snowResistance_modifier: float # DEFAULT 0 : Added to resistance
-onready var terrainAcceleration_modifier = terrainAcceleration.duplicate() # DEFAULT 0 : Added to terrainAcceleration
-onready var terrainSpeed_modifier = terrainSpeed.duplicate() # DEFAULT 0 : Added to terrainSpeed
+var terrainAcceleration_modifier: Dictionary # DEFAULT 0 : Added to terrainAcceleration
+var terrainSpeed_modifier: Dictionary # DEFAULT 0 : Added to terrainSpeed
 
 
 func _ready():
-	state_machine = $AnimationTree.get("parameters/playback")
-	player = $player
 	set_default_stats()
 	calculate_stats()
 
@@ -109,7 +112,8 @@ func set_default_stats():
 	default_snowResistance = snowResistance
 	default_terrainAcceleration = terrainAcceleration.duplicate()
 	default_terrainSpeed = terrainSpeed.duplicate()
-
+	terrainAcceleration_modifier = terrainAcceleration.duplicate()
+	terrainSpeed_modifier = terrainSpeed.duplicate()
 
 
 func reset_stats():
@@ -126,10 +130,13 @@ func reset_stats():
 		terrainAcceleration[type] = default_terrainAcceleration[type]
 	for type in terrainSpeed:
 		terrainSpeed[type] = default_terrainSpeed[type]
-	
+
+
+func reset_modifiers():
 	# RESET Main Modifiers
 	speed_modifier = Vector2(1, 1) # DEFAULT (1, 1)
 	gravity_modifier = 1.0 # DEFAULT 1
+	acceleration_modifier = 1 # DEFAULT 1
 	windResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.3)
 	rainResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.5)
 	snowResistance_modifier = 0.0 # DEFAULT 0 (Default resistance: 0.5)
@@ -139,22 +146,32 @@ func reset_stats():
 		terrainAcceleration_modifier[modifier] = 0.0 # DEFAULT 0
 	for modifier in terrainSpeed_modifier:
 		terrainSpeed_modifier[modifier] = Vector2(0, 0) # DEFAULT (0, 0)
+#	print_debug(terrainAcceleration_modifier)
+
 
 func get_modifiers():
-	""" EXAMPLES """
-	# speed_modifier.x = 1.5 # Super Speed
-	# speed_modifier.y = 1.2 # Super Jump
-	# terrainAcceleration_modifier["stone"] = 0.1 # Rock Climber
-	# terrainAcceleration_modifier["ice"] = 0.1 # Ice Climber
-	# terrainSpeed_modifier["grass"] = Vector2(0.5, 0) # Super speed on grass
-	gravity_modifier = 0.5 # Parachute
-	""" examples """
-	
+	reset_modifiers()
+	print_debug("Getting modifiers for: ", inventory.item[shoes].name," & ",inventory.item[accesory].name)
+#	speed_modifier = speed_modifier * inventory.item["Climbing Shoes"].speed_modifier
+	speed_modifier = speed_modifier * inventory.item[shoes].speed_modifier * inventory.item[accesory].speed_modifier # DEFAULT (1, 1)
+	gravity_modifier = gravity_modifier * inventory.item[shoes].gravity_modifier * inventory.item[accesory].gravity_modifier # DEFAULT 1
+	acceleration_modifier = acceleration_modifier * inventory.item[shoes].acceleration_modifier * inventory.item[accesory].acceleration_modifier
+	windResistance_modifier += inventory.item[shoes].windResistance_modifier + inventory.item[accesory].windResistance_modifier # DEFAULT 0 (Default resistance: 0.3)
+	rainResistance_modifier += inventory.item[shoes].rainResistance_modifier + inventory.item[accesory].rainResistance_modifier # DEFAULT 0 (Default resistance: 0.5)
+	snowResistance_modifier += inventory.item[shoes].snowResistance_modifier + inventory.item[accesory].snowResistance_modifier# DEFAULT 0 (Default resistance: 0.5)
+
+	# Get Terrain Modifiers
+	for modifier in terrainAcceleration_modifier:
+		terrainAcceleration_modifier[modifier] += inventory.item[shoes].terrainAcceleration_modifier[modifier] + inventory.item[accesory].terrainAcceleration_modifier[modifier] # DEFAULT 0
+	for modifier in terrainSpeed_modifier:
+		terrainSpeed_modifier[modifier] += inventory.item[shoes].terrainSpeed_modifier[modifier] + inventory.item[accesory].terrainSpeed_modifier[modifier] # DEFAULT (0, 0)
+
+#	terrainSpeed_modifier["grass"] = Vector2(-0.5,-0.5)
 
 func calculate_stats():
 	# print_debug("Recalculating stats...")
 	reset_stats()
-	get_modifiers()
+	get_modifiers() # IS THIS NECESSARY???
 	
 	# SPEED:
 	speed = default_speed * speed_modifier
@@ -177,8 +194,9 @@ func calculate_stats():
 	# TERRAIN ACCELERATION:
 	for modifier in terrainAcceleration_modifier:
 		terrainAcceleration[modifier] = default_terrainAcceleration[modifier] + terrainAcceleration_modifier[modifier]
-		if terrainAcceleration[modifier] < 0.0: terrainAcceleration[modifier] = 0.0 # LOW LIMIT
-		elif terrainAcceleration[modifier] > 1.0: terrainAcceleration[modifier] = 1.0 # HIGH LIMIT
+		# LIMITS NOT NECESSARY... Limit on "Set Acceleration" function
+		# if terrainAcceleration[modifier] <= 0.0: terrainAcceleration[modifier] = 0.01 # LOW LIMIT
+		# elif terrainAcceleration[modifier] > 1.0: terrainAcceleration[modifier] = 1.0 # HIGH LIMIT
 	# TERRAIN SPEED:
 	for modifier in terrainSpeed_modifier:
 		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
@@ -208,7 +226,15 @@ func calculate_move_velocity(
 	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
  
 	# JUMP (IMPORTANT: DELTA) 
-	new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
+	
+	# DEFAULT GAVITY FORMULA
+	# new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time() 
+
+	# ADDED GRAVITY MODIFIER while falling only:
+	if not is_on_floor() and new_velocity.y + gravity * gravity_modifier * get_physics_process_delta_time() > 0:
+		new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
+	else: new_velocity.y += gravity * get_physics_process_delta_time()
+	
 	if direction.y == -1.0:
 		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
 		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
@@ -252,12 +278,14 @@ func get_direction() -> Vector2:
 
 func set_acceleration():
 	
-	var accel = terrainAcceleration[terrain] + terrainAcceleration_modifier[terrain]
+	var accel = (terrainAcceleration[terrain] + terrainAcceleration_modifier[terrain]) * acceleration_modifier
 	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
 		accel = accel * (1 - weatherSize * rainResistance)
 	
+	if accel > 1: accel = 1 # HIGH LIMIT
+	elif accel <= 0: accel = 0.005 # LOW LIMIT
 
 	return accel
 
@@ -268,10 +296,10 @@ func calculate_modified_speed():
 	
 	# APPLY SPEED MODIFIER
 	# print_debug(terrainSpeed_modifier[terrain])
-	new_speed = speed * terrainSpeed[terrain]
+	new_speed = speed * terrainSpeed[terrain] # * terrainSpeed_modifier[terrain]
 	# print_debug(new_speed)
 	
-	# SNOW SPEED MODIFIER
+	# SNOW WEATHER SPEED MODIFIER
 	if weather == "snow":
 		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
 		new_speed.x = new_speed.x * (1 - weatherSize * snowResistance)
@@ -305,9 +333,9 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 				if current_tile == "unknown": #DEBUG ERROR if Tile is unknown
 					print_debug("Unknown tile type. Check tile name in scene's TileMap and terrainAcceleration Dictionary in Player")
 				# DEBUG tile position and type
-				# print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
-				# print_debug(_acceleration)
-				# print_debug(_modified_speed)
+				#print_debug("Player tile: ", tile_pos, " / Tile type: ", current_tile)
+				#print_debug(_acceleration)
+				#print_debug(_modified_speed)
 				
 	else: current_tile = "air" # Acceleration on air
 	
@@ -336,6 +364,26 @@ func weatherSize_changed(new_weatherSize):
 	weatherSize = new_weatherSize
 	_modified_speed = calculate_modified_speed()
 
+func shoes_changed(new_shoes):
+#	yield(inventory, "ready")
+	if shoes:
+		shoes = new_shoes
+		calculate_stats()
+		print_debug(inventory.item[shoes].name, " equipped. ", inventory.item[shoes].description)
+	else:
+		shoes = "Nothing"
+		print_debug("No shoes equipped")
+
+func accesory_changed(new_accesory):
+#	yield(inventory, "ready")
+	if accesory:
+		accesory = new_accesory
+		calculate_stats()
+		print_debug(inventory.item[accesory].name, " equipped. ", inventory.item[accesory].description)
+	else:
+		accesory = "Nothing"
+		print_debug("No accesory equipped")
+	
 
 """SIGNAL FUNCTIONS"""
 # Hace saltar al Player cuando un AREA2D entra en la zona especificada
