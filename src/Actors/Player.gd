@@ -8,7 +8,7 @@ onready var player = $player
 onready var inventory = $Inventory
 
 # NOT PUBLIC, set from Inventory
-#export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
+#export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets") onready var shoes = "Nothing" setget shoes_changed
 #export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
 
 var shoes = "Nothing" setget shoes_changed

@@ -5,12 +5,15 @@ extends Control
 # var a: int = 2
 # var b: String = "text"
 
+onready var shoes_label = $ShoesLabel
+onready var acccesory_label = $AccesoryLabel	
+
 onready var player = get_parent()
 
-export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
+export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets") onready var shoes = "Nothing" setget shoes_changed
 export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
 
-var shoesInventory = ["Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes"]
+var shoesInventory = ["Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets"]
 var toolsInventory =  ["Nothing", "Rain Coat", "Jumping Tool", "Guorren's Cape"]
 
 var item: Dictionary 
@@ -56,7 +59,7 @@ func _generate_item_list():
 	
 	# Nothing equiped
 	item["Nothing"] = player_item.new()
-	item["Nothing"].name = "Nothing"
+	item["Nothing"].name = ""
 	item["Nothing"].description = ""
 	
 	# Climbing Shoes
@@ -68,12 +71,12 @@ func _generate_item_list():
 	item["Climbing Shoes"].speed_modifier = Vector2(0.8, 1)
 	
 	# Snow Shoes
-	item["Snow Boots"] = player_item.new()
-	item["Snow Boots"].name = "Snow Boots"
-	item["Snow Boots"].description = "Gives normal speed on snow and snowy weather. Warning! Don't use on rocks!"
-	item["Snow Boots"].terrainSpeed_modifier["snow"] = Vector2(0.5,0.5)
-	item["Snow Boots"].snowResistance_modifier = 0.5
-	item["Snow Boots"].terrainAcceleration_modifier["stone"] = -0.05
+	item["Snow Rackets"] = player_item.new()
+	item["Snow Rackets"].name = "Snow Rackets"
+	item["Snow Rackets"].description = "Gives normal speed on snow and snowy weather. Warning! Don't use on rocks!"
+	item["Snow Rackets"].terrainSpeed_modifier["snow"] = Vector2(0.5,0.5)
+	item["Snow Rackets"].snowResistance_modifier = 0.5
+	item["Snow Rackets"].terrainAcceleration_modifier["stone"] = -0.05
 	
 	# Ice Crampons
 	item["Ice Crampons"] = player_item.new()
@@ -126,14 +129,18 @@ func shoes_changed(new_shoes):
 		shoes = new_shoes
 		print_debug(player)
 		player.shoes = shoes
+		shoes_label.text = item[shoes].name
 	else:
 		shoes = "Nothing"
-		
+	
+	
+	
 func accesory_changed(new_accesory):
 	if accesory:
 		accesory = new_accesory
 		print_debug(player)
 		player.accesory = accesory
+		acccesory_label.text = item[accesory].name
 	else: accesory = "Nothing"
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta: float) -> void:
