@@ -5,6 +5,11 @@ extends Control
 # var a: int = 2
 # var b: String = "text"
 
+onready var player = get_parent()
+
+export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
+export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
+
 var shoesInventory = ["Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes"]
 var toolsInventory =  ["Nothing", "Rain Coat", "Jumping Tool", "Guorren's Cape"]
 
@@ -57,8 +62,8 @@ func _generate_item_list():
 	# Climbing Shoes
 	item["Climbing Shoes"] = player_item.new()
 	item["Climbing Shoes"].name = "Climbing Shoes"
-	item["Climbing Shoes"].name = "Better grip on rocks, but slightly slows down speed. Warning: Do not use on ice!!"
-	item["Climbing Shoes"].terrainAcceleration_modifier["stone"] = 0.1
+	item["Climbing Shoes"].description = "Better grip on rocks, but slightly slows down speed. Warning: Do not use on ice!!"
+	item["Climbing Shoes"].terrainAcceleration_modifier["stone"] = 0.2
 	item["Climbing Shoes"].terrainAcceleration_modifier["ice"] = -0.02
 	item["Climbing Shoes"].speed_modifier = Vector2(0.8, 1)
 	
@@ -74,7 +79,7 @@ func _generate_item_list():
 	item["Ice Crampons"] = player_item.new()
 	item["Ice Crampons"].name = "Ice Crampons"
 	item["Ice Crampons"].description = "Allows climbing on ice. Slows down speed on grass and rocks."
-	item["Ice Crampons"].terrainAcceleration_modifier["ice"] = 0.1
+	item["Ice Crampons"].terrainAcceleration_modifier["ice"] = 0.2
 	item["Ice Crampons"].terrainSpeed_modifier["stone"] = Vector2(-0.5, 0)
 	item["Ice Crampons"].terrainSpeed_modifier["grass"] = Vector2(-0.3, 0)
 	
@@ -116,9 +121,20 @@ func _generate_item_list():
 #			)
 	
 	
-	
-	
-
+func shoes_changed(new_shoes):
+	if shoes:
+		shoes = new_shoes
+		print_debug(player)
+		player.shoes = shoes
+	else:
+		shoes = "Nothing"
+		
+func accesory_changed(new_accesory):
+	if accesory:
+		accesory = new_accesory
+		print_debug(player)
+		player.accesory = accesory
+	else: accesory = "Nothing"
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta: float) -> void:
 #	pass

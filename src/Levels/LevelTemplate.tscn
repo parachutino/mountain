@@ -128,6 +128,9 @@ visible = false
 [node name="AnimationTree" parent="Player" index="5"]
 parameters/playback = SubResource( 1 )
 
+[node name="Inventory" parent="Player" index="6"]
+shoes = "Ice Crampons"
+
 [node name="TileMap" type="TileMap" parent="."]
 rotation = 0.000642904
 tile_set = ExtResource( 2 )

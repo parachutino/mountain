@@ -7,8 +7,12 @@ onready var state_machine = $AnimationTree.get("parameters/playback")
 onready var player = $player
 onready var inventory = $Inventory
 
-export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
-export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
+# NOT PUBLIC, set from Inventory
+#export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Shoes") onready var shoes = "Nothing" setget shoes_changed
+#export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
+
+var shoes = "Nothing" setget shoes_changed
+var accesory = "Nothing" setget accesory_changed
 
 # Define MAX velocidad en X y en Y...
 export var speed: = Vector2(200.0, 350.0)
@@ -83,7 +87,9 @@ func _physics_process(_delta: float) -> void:
 	
 	get_tile_type()
 	
-	if last_terrain != terrain: _modified_speed = calculate_modified_speed()
+	if last_terrain != terrain:
+		print_debug("Modifying speed for: ", terrain)
+		_modified_speed = calculate_modified_speed()
 	
 	_acceleration = set_acceleration() # Defines aceleration based on terrain
 	
@@ -192,14 +198,14 @@ func calculate_stats():
 	elif snowResistance > 1: snowResistance = 1 # HIGH LIMIT
 	
 	# TERRAIN ACCELERATION:
-	for modifier in terrainAcceleration_modifier:
-		terrainAcceleration[modifier] = default_terrainAcceleration[modifier] + terrainAcceleration_modifier[modifier]
-		# LIMITS NOT NECESSARY... Limit on "Set Acceleration" function
-		# if terrainAcceleration[modifier] <= 0.0: terrainAcceleration[modifier] = 0.01 # LOW LIMIT
-		# elif terrainAcceleration[modifier] > 1.0: terrainAcceleration[modifier] = 1.0 # HIGH LIMIT
-	# TERRAIN SPEED:
-	for modifier in terrainSpeed_modifier:
-		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
+#	for modifier in terrainAcceleration_modifier:
+#		terrainAcceleration[modifier] = default_terrainAcceleration[modifier] + terrainAcceleration_modifier[modifier]
+#		# LIMITS NOT NECESSARY... Limit on "Set Acceleration" function
+#		# if terrainAcceleration[modifier] <= 0.0: terrainAcceleration[modifier] = 0.01 # LOW LIMIT
+#		# elif terrainAcceleration[modifier] > 1.0: terrainAcceleration[modifier] = 1.0 # HIGH LIMIT
+#	# TERRAIN SPEED:
+#	for modifier in terrainSpeed_modifier:
+#		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
 
 
 """MOVEMENT FUNCTIONS"""
@@ -296,8 +302,8 @@ func calculate_modified_speed():
 	
 	# APPLY SPEED MODIFIER
 	# print_debug(terrainSpeed_modifier[terrain])
-	new_speed = speed * terrainSpeed[terrain] # * terrainSpeed_modifier[terrain]
-	# print_debug(new_speed)
+	new_speed = speed * (terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
+	#print_debug(new_speed)
 	
 	# SNOW WEATHER SPEED MODIFIER
 	if weather == "snow":
@@ -358,11 +364,13 @@ func die() -> void:
 """SETGET FUNCTIONS"""
 func weather_changed(new_weather):
 	weather = new_weather
+	print_debug(weather, " speed")
 	_modified_speed = calculate_modified_speed()
 
 func weatherSize_changed(new_weatherSize):
 	weatherSize = new_weatherSize
-	_modified_speed = calculate_modified_speed()
+#	print_debug("Weather size: ", weatherSize, " speed")
+#	_modified_speed = calculate_modified_speed()
 
 func shoes_changed(new_shoes):
 #	yield(inventory, "ready")
@@ -370,6 +378,9 @@ func shoes_changed(new_shoes):
 		shoes = new_shoes
 		calculate_stats()
 		print_debug(inventory.item[shoes].name, " equipped. ", inventory.item[shoes].description)
+		print_debug(shoes, " speed")
+		_modified_speed = calculate_modified_speed()
+		
 	else:
 		shoes = "Nothing"
 		print_debug("No shoes equipped")
@@ -380,9 +391,13 @@ func accesory_changed(new_accesory):
 		accesory = new_accesory
 		calculate_stats()
 		print_debug(inventory.item[accesory].name, " equipped. ", inventory.item[accesory].description)
+		print_debug(accesory, " speed")
+		_modified_speed = calculate_modified_speed()
 	else:
 		accesory = "Nothing"
 		print_debug("No accesory equipped")
+	
+	
 	
 
 """SIGNAL FUNCTIONS"""
