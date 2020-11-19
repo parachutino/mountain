@@ -149,12 +149,12 @@ weatherType = "clear"
 wind = 0.0
 
 [node name="WeatherControl" parent="." instance=ExtResource( 5 )]
-margin_left = 307.381
-margin_top = 74.6199
-margin_right = 407.381
-margin_bottom = 126.62
+margin_left = 305.74
+margin_top = 62.8907
+margin_right = 405.74
+margin_bottom = 114.891
 weatherType = "snow"
-size = 0.7
+size = 0.523
 
 [node name="WeatherControl2" parent="." instance=ExtResource( 5 )]
 margin_left = 50.5409
@@ -162,6 +162,6 @@ margin_top = 154.242
 margin_right = 128.541
 margin_bottom = 197.242
 weatherType = "snow"
-size = 0.106
+size = 0.303
 
 [editable path="Player"]

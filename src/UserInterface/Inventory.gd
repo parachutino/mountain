@@ -71,10 +71,10 @@ func _generate_item_list():
 	item["Climbing Shoes"].terrainAcceleration_modifier["ice"] = -0.02
 	item["Climbing Shoes"].speed_modifier = Vector2(0.8, 1)
 	
-	# Snow Shoes
+	# Snow Rackets
 	item["Snow Rackets"] = player_item.new()
 	item["Snow Rackets"].name = "Snow Rackets"
-	item["Snow Rackets"].description = "Gives normal speed on snow and snowy weather. Slows down on other terrains if not snowing."
+	item["Snow Rackets"].description = "Gives normal speed on snow and snowy weather. Slows down on other terrains if not snowing. Snow can also help to climb difficult surfaces"
 	item["Snow Rackets"].snowResistance_modifier = 0.5
 	
 	# SET ALL TERRAIN SPEEDS TO HALF...
@@ -100,7 +100,7 @@ func _generate_item_list():
 	item["Rain Coat"].rainResistance_modifier = 0.5
 	item["Rain Coat"].windResistance_modifier = -0.2
 	
-		# Parachute
+	# Jumping Tool
 	item["Jumping Tool"] = player_item.new()
 	item["Jumping Tool"].name = "Jumping Tool"
 	item["Jumping Tool"].description = "Allows to jump very high! But it's almost impossible to walk while using it."

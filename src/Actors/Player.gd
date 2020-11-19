@@ -341,8 +341,9 @@ func set_acceleration():
 		accel = accel * (1 - weatherSize * (1 - rainResistance))
 	
 	# IF SNOWING AND SNOW RACKETS, Adds acceleration
-	if weather == "snow" and shoes == "Snow Rackets":
+	if weather == "snow" and shoes == "Snow Rackets" and terrain != "air":
 		accel = accel + 0.25 * weatherSize
+		print_debug("RACKETS ACCELERATION")
 	
 	if accel > 1: accel = 1 # HIGH LIMIT
 	elif accel <= 0: accel = 0.005 # LOW LIMIT
@@ -368,13 +369,18 @@ func calculate_modified_speed():
 		
 		# SNOW RACKETS: Normalize speed depending on snow size (Size 1 = Normal)
 		if shoes == "Snow Rackets": 
-			if terrain != "snow" or terrain != "air":
-				new_speed.x = speed.x * (0.5 + 0.5 * weatherSize) 
+			if terrain == "snow" or terrain == "air":
+				pass
+			else:
+				new_speed.x = speed.x * (0.5 + 0.5 * weatherSize)
+				print_debug("RACKETS SPEED")
 		
-		print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)): ", snowResistance, " = ", _modified_speed.x)
-		new_speed.x = new_speed.x * (1 - weatherSize * (1 - snowResistance))
+		else:
+			new_speed.x = new_speed.x * (1 - weatherSize * (1 - snowResistance))
+			print_debug("Speed X: ", new_speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)", snowResistance, "): = ", _modified_speed.x)
 		
-	if debugMode: print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
+		
+	if debugMode: print_debug("Speed: ", speed, " / Modified Speed: ", new_speed)
 	
 #	print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
 
