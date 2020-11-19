@@ -74,12 +74,16 @@ func _generate_item_list():
 	# Snow Shoes
 	item["Snow Rackets"] = player_item.new()
 	item["Snow Rackets"].name = "Snow Rackets"
-	item["Snow Rackets"].description = "Gives normal speed on snow and snowy weather. Warning! Don't use on rocks!"
-	item["Snow Rackets"].terrainSpeed_modifier["snow"] = Vector2(0.5,0.5)
+	item["Snow Rackets"].description = "Gives normal speed on snow and snowy weather. Slows down on other terrains if not snowing."
 	item["Snow Rackets"].snowResistance_modifier = 0.5
-	item["Snow Rackets"].terrainSpeed_modifier["stone"] = Vector2(-0.5, 0)
-	item["Snow Rackets"].terrainSpeed_modifier["grass"] = Vector2(-0.5, 0)
-	item["Snow Rackets"].terrainAcceleration_modifier["ice"] = -0.02
+	
+	# SET ALL TERRAIN SPEEDS TO HALF...
+	for modifier in item["Snow Rackets"].terrainSpeed_modifier:
+		item["Snow Rackets"].terrainSpeed_modifier[modifier] = Vector2(-0.5, 0)	
+	# ... EXCEPT SNOW AND AIR
+	item["Snow Rackets"].terrainSpeed_modifier["air"] = Vector2(0, 0)
+	item["Snow Rackets"].terrainSpeed_modifier["snow"] = Vector2(0.5,0.5)
+	# VIEW SET_ACCELERATION AND CALCULATE_MODIFIED_SPEED FOR EXTRA EFFECTS...
 	
 	# Ice Crampons
 	item["Ice Crampons"] = player_item.new()

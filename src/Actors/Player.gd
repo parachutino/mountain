@@ -209,7 +209,6 @@ func reset_modifiers():
 
 func get_modifiers():
 	reset_modifiers()
-#	speed_modifier = speed_modifier * inventory.item["Climbing Shoes"].speed_modifier
 	speed_modifier = speed_modifier * inventory.item[shoes].speed_modifier * inventory.item[accesory].speed_modifier # DEFAULT (1, 1)
 	gravity_modifier = gravity_modifier * inventory.item[shoes].gravity_modifier * inventory.item[accesory].gravity_modifier # DEFAULT 1
 	acceleration_modifier = acceleration_modifier * inventory.item[shoes].acceleration_modifier * inventory.item[accesory].acceleration_modifier
@@ -341,9 +340,15 @@ func set_acceleration():
 	if weather == "rain":
 		accel = accel * (1 - weatherSize * (1 - rainResistance))
 	
+	# IF SNOWING AND SNOW RACKETS, Adds acceleration
+	if weather == "snow" and shoes == "Snow Rackets":
+		accel = accel + 0.25 * weatherSize
+	
 	if accel > 1: accel = 1 # HIGH LIMIT
 	elif accel <= 0: accel = 0.005 # LOW LIMIT
-
+	
+	print_debug("Acceleration: ", accel)
+	
 	return accel
 
 
@@ -360,9 +365,15 @@ func calculate_modified_speed():
 	
 	# SNOW WEATHER SPEED MODIFIER
 	if weather == "snow":
+		
+		# SNOW RACKETS: Normalize speed depending on snow size (Size 1 = Normal)
+		if shoes == "Snow Rackets": 
+			if terrain != "snow" or terrain != "air":
+				new_speed.x = speed.x * (0.5 + 0.5 * weatherSize) 
+		
 		print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)): ", snowResistance, " = ", _modified_speed.x)
 		new_speed.x = new_speed.x * (1 - weatherSize * (1 - snowResistance))
-
+		
 	if debugMode: print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
 	
 #	print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
