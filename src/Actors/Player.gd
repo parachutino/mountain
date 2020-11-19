@@ -14,6 +14,9 @@ onready var inventory = $Inventory
 var shoes = "Nothing" setget shoes_changed
 var accesory = "Nothing" setget accesory_changed
 
+# PRINT DEBUG MESSAGES
+export var debugMode = false
+
 # Define MAX velocidad en X y en Y...
 export var speed: = Vector2(200.0, 350.0)
 export var gravity: = 1000.0
@@ -90,10 +93,11 @@ func _physics_process(_delta: float) -> void:
 	get_tile_type()
 	
 	if last_terrain != terrain:
-		print_debug("Modifying speed for: ", terrain)
-		_modified_speed = calculate_modified_speed()
-	
-	_acceleration = set_acceleration() # Defines aceleration based on terrain
+		if debugMode: print_debug("TERRAIN CHANGED TO: ", terrain)
+		recalculate_all()
+		if debugMode: print_debug("MODIFIED SPEED FOR: ", terrain)
+		
+		
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
 	_velocity = calculate_move_velocity(_velocity, direction, _modified_speed, is_jump_interrupted)
@@ -107,11 +111,14 @@ func _physics_process(_delta: float) -> void:
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
 
-
+func recalculate_all():
+	calculate_stats()
+	_acceleration = set_acceleration() # Defines aceleration based on terrain
+	_modified_speed = calculate_modified_speed()
 
 func temp_UI(): # UI TEMPORANEA CON TASTIERA E JOYSTICK
 	
-	# KEYBOARD TYUI GHJK
+	# KEYBOARD 1234 5678
 	if Input.is_action_just_pressed("select_shoes_0"): inventory.shoes = inventory.shoesInventory[0]
 	if Input.is_action_just_pressed("select_shoes_1"): inventory.shoes = inventory.shoesInventory[1]
 	if Input.is_action_just_pressed("select_shoes_2"): inventory.shoes = inventory.shoesInventory[2]
@@ -123,12 +130,21 @@ func temp_UI(): # UI TEMPORANEA CON TASTIERA E JOYSTICK
 	
 	# JOYSTICK Right Stick
 	var select = Vector2(
-		int(Input.get_action_strength("select_right")-Input.get_action_strength("select_left")),
-		int(Input.get_action_strength("select_up")-Input.get_action_strength("select_down"))
+		Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
+		Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
 		)
-	print_debug(select)
 	
-	# KEYBOARD TYUI GHJK
+	# NORMALIZE Right Stick
+	if select.x > 0.5: select.x = 1
+	elif select.x < -0.5: select.x = -1
+	else: select.x = 0
+	if select.y > 0.5: select.y = 1
+	elif select.y < -0.5: select.y = -1
+	else: select.y = 0
+	
+	# print_debug(select)
+	
+	# KEYBOARD GTYU GHJK
 	if select == Vector2(-1,0): inventory.shoes = inventory.shoesInventory[0]
 	if select == Vector2(-1,1): inventory.shoes = inventory.shoesInventory[1]
 	if select == Vector2(0,1): inventory.shoes = inventory.shoesInventory[2]
@@ -142,7 +158,6 @@ func temp_UI(): # UI TEMPORANEA CON TASTIERA E JOYSTICK
 
 """STATS FUNCTIONS"""
 func set_default_stats():
-	
 	# Store stats default values from public variables
 	default_speed = speed
 	default_gravity = gravity
@@ -153,6 +168,8 @@ func set_default_stats():
 	default_terrainSpeed = terrainSpeed.duplicate()
 	terrainAcceleration_modifier = terrainAcceleration.duplicate()
 	terrainSpeed_modifier = terrainSpeed.duplicate()
+	
+	if debugMode: print_debug("Set default stats")
 
 
 func reset_stats():
@@ -169,7 +186,8 @@ func reset_stats():
 		terrainAcceleration[type] = default_terrainAcceleration[type]
 	for type in terrainSpeed:
 		terrainSpeed[type] = default_terrainSpeed[type]
-
+	
+	if debugMode: print_debug("Resetted stats")
 
 func reset_modifiers():
 	# RESET Main Modifiers
@@ -185,12 +203,12 @@ func reset_modifiers():
 		terrainAcceleration_modifier[modifier] = 0.0 # DEFAULT 0
 	for modifier in terrainSpeed_modifier:
 		terrainSpeed_modifier[modifier] = Vector2(0, 0) # DEFAULT (0, 0)
-#	print_debug(terrainAcceleration_modifier)
+
+	if debugMode: print_debug("Resetted modifiers")
 
 
 func get_modifiers():
 	reset_modifiers()
-	print_debug("Getting modifiers for: ", inventory.item[shoes].name," & ",inventory.item[accesory].name)
 #	speed_modifier = speed_modifier * inventory.item["Climbing Shoes"].speed_modifier
 	speed_modifier = speed_modifier * inventory.item[shoes].speed_modifier * inventory.item[accesory].speed_modifier # DEFAULT (1, 1)
 	gravity_modifier = gravity_modifier * inventory.item[shoes].gravity_modifier * inventory.item[accesory].gravity_modifier # DEFAULT 1
@@ -201,15 +219,14 @@ func get_modifiers():
 
 	# Get Terrain Modifiers
 	for modifier in terrainAcceleration_modifier:
-		terrainAcceleration_modifier[modifier] += inventory.item[shoes].terrainAcceleration_modifier[modifier] + inventory.item[accesory].terrainAcceleration_modifier[modifier] # DEFAULT 0
+		terrainAcceleration_modifier[modifier] = inventory.item[shoes].terrainAcceleration_modifier[modifier] + inventory.item[accesory].terrainAcceleration_modifier[modifier] # DEFAULT 0
 	for modifier in terrainSpeed_modifier:
-		terrainSpeed_modifier[modifier] += inventory.item[shoes].terrainSpeed_modifier[modifier] + inventory.item[accesory].terrainSpeed_modifier[modifier] # DEFAULT (0, 0)
-
-#	terrainSpeed_modifier["grass"] = Vector2(-0.5,-0.5)
+		terrainSpeed_modifier[modifier] = inventory.item[shoes].terrainSpeed_modifier[modifier] + inventory.item[accesory].terrainSpeed_modifier[modifier] # DEFAULT (0, 0)
+	
+	if debugMode: print_debug("Got modifiers for: ", inventory.item[shoes].name," & ",inventory.item[accesory].name, " equips.")
 
 func calculate_stats():
-	# print_debug("Recalculating stats...")
-	reset_stats()
+
 	get_modifiers() # IS THIS NECESSARY???
 	
 	# SPEED:
@@ -240,6 +257,7 @@ func calculate_stats():
 #	for modifier in terrainSpeed_modifier:
 #		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
 
+	if debugMode: print_debug("Calculated stats...")
 
 """MOVEMENT FUNCTIONS"""
 
@@ -258,7 +276,7 @@ func calculate_move_velocity(
 	
 	# WIND
 	if (abs(wind) - windResistance) > 0:
-		new_velocity.x += spd.x * (wind - (wind/abs(wind) * windResistance))
+		new_velocity.x += speed.x * (wind - (wind/abs(wind) * windResistance))
 	"""---------"""
 	
 	# ACCELERATION: Gradually accelerate / brake
@@ -269,7 +287,7 @@ func calculate_move_velocity(
 	# DEFAULT GAVITY FORMULA
 	# new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time() 
 
-	# ADDED GRAVITY MODIFIER while falling only:
+	# ADDS GRAVITY MODIFIER while falling only:
 	if not is_on_floor() and new_velocity.y + gravity * gravity_modifier * get_physics_process_delta_time() > 0:
 		new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
 	else: new_velocity.y += gravity * get_physics_process_delta_time()
@@ -321,7 +339,7 @@ func set_acceleration():
 	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
-		accel = accel * (1 - weatherSize * rainResistance)
+		accel = accel * (1 - weatherSize * (1 - rainResistance))
 	
 	if accel > 1: accel = 1 # HIGH LIMIT
 	elif accel <= 0: accel = 0.005 # LOW LIMIT
@@ -334,16 +352,20 @@ func calculate_modified_speed():
 	var new_speed = last_speed
 	
 	# APPLY SPEED MODIFIER
-	# print_debug(terrainSpeed_modifier[terrain])
+	print_debug("Terrain Speed: ", terrainSpeed[terrain], " Terrain Speed Modifier: ", terrainSpeed_modifier[terrain])
+	print_debug("Terrain: ",terrain, " / Final Modifier: ", terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
 	new_speed = speed * (terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
+	
 	#print_debug(new_speed)
 	
 	# SNOW WEATHER SPEED MODIFIER
 	if weather == "snow":
-		# print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * snowResistance: ", snowResistance)
-		new_speed.x = new_speed.x * (1 - weatherSize * snowResistance)
+		print_debug("Speed X: ", speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)): ", snowResistance, " = ", _modified_speed.x)
+		new_speed.x = new_speed.x * (1 - weatherSize * (1 - snowResistance))
 
-	# print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
+	if debugMode: print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
+	
+#	print_debug("Speed: ", speed, " / Modified Speed: ", _modified_speed)
 
 	return new_speed
 
@@ -397,41 +419,48 @@ func die() -> void:
 """SETGET FUNCTIONS"""
 func weather_changed(new_weather):
 	weather = new_weather
-	print_debug(weather, " speed")
-	_modified_speed = calculate_modified_speed()
+	recalculate_all()
+	
+	if debugMode: print_debug(weather, " speed")
+
 
 func weatherSize_changed(new_weatherSize):
 	weatherSize = new_weatherSize
-#	print_debug("Weather size: ", weatherSize, " speed")
-#	_modified_speed = calculate_modified_speed()
+	recalculate_all()
+	
+	if debugMode: print_debug("Weather size: ", weatherSize, " speed")
+
 
 func shoes_changed(new_shoes):
 #	yield(inventory, "ready")
 	if shoes:
 		shoes = new_shoes
-		calculate_stats()
-		print_debug(inventory.item[shoes].name, " equipped. ", inventory.item[shoes].description)
-		print_debug(shoes, " speed")
-		_modified_speed = calculate_modified_speed()
+		recalculate_all()
+		
+		if debugMode: print_debug(inventory.item[shoes].name, " equipped. ", inventory.item[shoes].description)
+		if debugMode: print_debug(shoes, " speed")
 		
 	else:
 		shoes = "Nothing"
-		print_debug("No shoes equipped")
+		
+		if debugMode: print_debug("No shoes equipped")
+
 
 func accesory_changed(new_accesory):
 #	yield(inventory, "ready")
 	if accesory:
 		accesory = new_accesory
-		calculate_stats()
-		print_debug(inventory.item[accesory].name, " equipped. ", inventory.item[accesory].description)
-		print_debug(accesory, " speed")
-		_modified_speed = calculate_modified_speed()
+		recalculate_all()
+		
+		if debugMode: print_debug(inventory.item[accesory].name, " equipped. ", inventory.item[accesory].description)
+		if debugMode: print_debug(accesory, " speed")
+	
 	else:
 		accesory = "Nothing"
-		print_debug("No accesory equipped")
 	
-	
-	
+		if debugMode: print_debug("No accesory equipped")
+
+
 
 """SIGNAL FUNCTIONS"""
 # Hace saltar al Player cuando un AREA2D entra en la zona especificada

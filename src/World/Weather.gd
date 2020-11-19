@@ -85,7 +85,7 @@ func change_weather():
 	# CHANGE PLAYER WEATHER VARIABLES
 	if player:
 		player.weather = weatherType
-		change_player_weatherSize(0.1) # player.weatherSize = size
+		change_player_weatherSize(size) # player.weatherSize = size
 		change_player_wind(wind) # player.wind = wind
 		
 	# SETS LAST_AMOUNT FOR CHANGE CHECK
