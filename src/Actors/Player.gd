@@ -3,7 +3,8 @@ class_name Player
 
 const FLOOR_NORMAL: = Vector2.UP
 
-onready var state_machine = $AnimationTree.get("parameters/playback")
+onready var state = $AnimationTree.get("parameters/playback")
+onready var animation_player = $AnimationPlayer
 onready var player = $player
 onready var inventory = $Inventory
 
@@ -50,6 +51,7 @@ var weather: String = 'clear' setget weather_changed
 var weatherSize: float = 0.0 setget weatherSize_changed
 var wind: float = 0.0
 
+var _direction: = Vector2.ZERO
 var _velocity: = Vector2.ZERO
 var _acceleration: float = 0.25
 var _modified_speed: Vector2 = speed
@@ -77,6 +79,13 @@ var snowResistance_modifier: float # DEFAULT 0 : Added to resistance
 var terrainAcceleration_modifier: Dictionary # DEFAULT 0 : Added to terrainAcceleration
 var terrainSpeed_modifier: Dictionary # DEFAULT 0 : Added to terrainSpeed
 
+var playerSpritesNormal: Dictionary = {
+	"Nothing" : preload("res://assets/climber/climber_hiking_sprite.png"),
+	"Climbing Shoes" : preload("res://assets/climber/climber_climbing_sprite.png"),
+	"Ice Crampons" : preload("res://assets/climber/climber_crampons_sprite.png"),
+	"Snow Rackets": preload("res://assets/climber/climber_rackets_sprite.png"),
+	}
+
 
 func _ready():
 	set_default_stats()
@@ -88,7 +97,7 @@ func _process(delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 		
 	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0 # Interrupts jump if button released
-	var direction: = get_direction() # Gets input from keyboard / joystick
+	_direction = get_direction() # Gets input from keyboard / joystick
 	
 	get_tile_type()
 	
@@ -100,7 +109,7 @@ func _physics_process(_delta: float) -> void:
 		
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
-	_velocity = calculate_move_velocity(_velocity, direction, _modified_speed, is_jump_interrupted)
+	_velocity = calculate_move_velocity(_velocity, _direction, _modified_speed, is_jump_interrupted)
 	
 	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
 		# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
@@ -110,6 +119,33 @@ func _physics_process(_delta: float) -> void:
 								1.3, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
+
+	state_machine() #APPLY STATE ANIMATION
+
+
+func state_machine():
+	
+	if _direction.x > 0: player.scale.x = 1
+	elif _direction.x < 0: player.scale.x = -1
+	
+	if is_on_floor():
+		if _direction.x == 0: state.travel("idle")
+		else:
+			# animation_player.playback_speed = _modified_speed.x / speed.x
+			# print_debug("Animation Speed: ", _modified_speed.x / speed.x)
+			state.travel("run")
+
+		
+	else:
+		state.travel("fall")
+	
+	if _direction.y == -1:
+		state.travel("jump")
+		print_debug("JUMP!!!")
+
+func change_sprite(shoes, accesory):
+	
+	player.set_texture(playerSpritesNormal[shoes])
 
 func recalculate_all():
 	calculate_stats()
@@ -239,13 +275,13 @@ func calculate_stats():
 	windResistance += (terrainAcceleration[terrain] + terrainAcceleration_modifier[terrain]) * acceleration_modifier
 	if windResistance < 0: windResistance = 0 # LOW LIMIT
 	elif windResistance > 1: windResistance = 1 # HIGH LIMIT
-	print_debug("Wind Reistance: ",windResistance)
+	if debugMode: print_debug("Wind Reistance: ",windResistance)
 	
 	# RAIN RESISTANCE:
 	rainResistance = default_rainResistance + rainResistance_modifier
 	if rainResistance < 0: rainResistance = 0 # LOW LIMIT
 	elif rainResistance > 1: rainResistance = 1 # HIGH LIMIT
-	print_debug("Rain Reistance: ",rainResistance)
+	if debugMode: print_debug("Rain Reistance: ",rainResistance)
 	
 	# SNOW RESISTANCE:
 	snowResistance = default_snowResistance + snowResistance_modifier
@@ -325,15 +361,6 @@ func get_direction() -> Vector2:
 	
 	# DEBUG JUMP
 	# if Input.is_action_just_pressed("jump") and not is_on_floor(): print_debug("NOT ON FLOOR!!")
-	
-	if dir.x > 0: player.scale.x = -1
-	elif dir.x < 0: player.scale.x = 1
-	
-	if is_on_floor():
-		if dir.x == 0: state_machine.travel("idle")
-		else: state_machine.travel("run")
-	
-	else: state_machine.travel("run")
 	
 	return dir
 
@@ -467,7 +494,8 @@ func shoes_changed(new_shoes):
 		shoes = "Nothing"
 		
 		if debugMode: print_debug("No shoes equipped")
-
+	
+	change_sprite(new_shoes, accesory)
 
 func accesory_changed(new_accesory):
 #	yield(inventory, "ready")
