@@ -22,7 +22,7 @@ export var speed: = Vector2(200.0, 350.0)
 export var gravity: = 1000.0
 export var stomp_impulse = 1000.0
 
-export (float, 0, 1) var windResistance = 0.3
+export (float, 0, 1) var windResistance = 0.2
 export (float, 0, 1) var rainResistance = 0.4
 export (float, 0, 1) var snowResistance = 0.4
 
@@ -54,7 +54,7 @@ var _velocity: = Vector2.ZERO
 var _acceleration: float = 0.25
 var _modified_speed: Vector2 = speed
 
-var terrain: String = ""
+var terrain: String = "air"
 var last_terrain: String = "normal"
 var player_tile_position: Vector2
 
@@ -235,12 +235,18 @@ func calculate_stats():
 
 	# WIND RESISTANCE:
 	windResistance = default_windResistance + windResistance_modifier
+	# ADD WIND RESISTANCE BASED ON TERRAIN ACCELERATION
+	windResistance += (terrainAcceleration[terrain] + terrainAcceleration_modifier[terrain]) * acceleration_modifier
 	if windResistance < 0: windResistance = 0 # LOW LIMIT
 	elif windResistance > 1: windResistance = 1 # HIGH LIMIT
+	print_debug("Wind Reistance: ",windResistance)
+	
 	# RAIN RESISTANCE:
-	rainResistance = default_windResistance + windResistance_modifier
+	rainResistance = default_rainResistance + rainResistance_modifier
 	if rainResistance < 0: rainResistance = 0 # LOW LIMIT
 	elif rainResistance > 1: rainResistance = 1 # HIGH LIMIT
+	print_debug("Rain Reistance: ",rainResistance)
+	
 	# SNOW RESISTANCE:
 	snowResistance = default_snowResistance + snowResistance_modifier
 	if snowResistance < 0: snowResistance = 0 # LOW LIMIT
@@ -343,12 +349,12 @@ func set_acceleration():
 	# IF SNOWING AND SNOW RACKETS, Adds acceleration
 	if weather == "snow" and shoes == "Snow Rackets" and terrain != "air":
 		accel = accel + 0.25 * weatherSize
-		print_debug("RACKETS ACCELERATION")
+		if debugMode: print_debug("RACKETS ACCELERATION")
 	
 	if accel > 1: accel = 1 # HIGH LIMIT
 	elif accel <= 0: accel = 0.005 # LOW LIMIT
 	
-	print_debug("Acceleration: ", accel)
+	if debugMode: print_debug("Set Acceleration: ", accel)
 	
 	return accel
 
@@ -358,8 +364,8 @@ func calculate_modified_speed():
 	var new_speed = last_speed
 	
 	# APPLY SPEED MODIFIER
-	print_debug("Terrain Speed: ", terrainSpeed[terrain], " Terrain Speed Modifier: ", terrainSpeed_modifier[terrain])
-	print_debug("Terrain: ",terrain, " / Final Modifier: ", terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
+	# print_debug("Terrain Speed: ", terrainSpeed[terrain], " Terrain Speed Modifier: ", terrainSpeed_modifier[terrain])
+	# print_debug("Terrain: ",terrain, " / Final Modifier: ", terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
 	new_speed = speed * (terrainSpeed[terrain] + terrainSpeed_modifier[terrain])
 	
 	#print_debug(new_speed)
@@ -373,11 +379,11 @@ func calculate_modified_speed():
 				pass
 			else:
 				new_speed.x = speed.x * (0.5 + 0.5 * weatherSize)
-				print_debug("RACKETS SPEED")
+				if debugMode: print_debug("RACKETS SPEED")
 		
 		else:
 			new_speed.x = new_speed.x * (1 - weatherSize * (1 - snowResistance))
-			print_debug("Speed X: ", new_speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)", snowResistance, "): = ", _modified_speed.x)
+			if debugMode: print_debug("Speed X: ", new_speed.x, " * (1 - weatherSize ", weatherSize, " * (1 - snowResistance)", snowResistance, "): = ", _modified_speed.x)
 		
 		
 	if debugMode: print_debug("Speed: ", speed, " / Modified Speed: ", new_speed)

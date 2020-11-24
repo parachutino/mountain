@@ -134,7 +134,6 @@ func _generate_item_list():
 func shoes_changed(new_shoes):
 	if shoes:
 		shoes = new_shoes
-		print_debug(player)
 		player.shoes = shoes
 		shoes_label.text = item[shoes].name
 	else:
@@ -145,7 +144,6 @@ func shoes_changed(new_shoes):
 func accesory_changed(new_accesory):
 	if accesory:
 		accesory = new_accesory
-		print_debug(player)
 		player.accesory = accesory
 		acccesory_label.text = item[accesory].name
 	else: accesory = "Nothing"
