@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://assets/climber/climber_hiking_sprite.png" type="Texture" id=1]
 [ext_resource path="res://src/Actors/Player.gd" type="Script" id=2]
@@ -94,18 +94,15 @@ tracks/0/keys = {
 }
 
 [sub_resource type="AnimationNodeAnimation" id=8]
-animation = "run"
-
-[sub_resource type="AnimationNodeAnimation" id=9]
 animation = "fall"
 
-[sub_resource type="AnimationNodeAnimation" id=10]
+[sub_resource type="AnimationNodeAnimation" id=9]
 animation = "idle"
 
-[sub_resource type="AnimationNodeAnimation" id=11]
+[sub_resource type="AnimationNodeAnimation" id=10]
 animation = "jump"
 
-[sub_resource type="AnimationNodeAnimation" id=12]
+[sub_resource type="AnimationNodeAnimation" id=11]
 animation = "land"
 
 [sub_resource type="AnimationNodeAnimation" id=13]
@@ -123,6 +120,8 @@ nodes/output/position = Vector2( 640, 80 )
 node_connections = [ "output", 0, "TimeScale", "TimeScale", 0, "Animation" ]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=16]
+switch_mode = 2
+auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=17]
 
@@ -133,8 +132,6 @@ auto_advance = true
 [sub_resource type="AnimationNodeStateMachineTransition" id=19]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=20]
-switch_mode = 2
-auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=21]
 
@@ -142,36 +139,26 @@ auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=23]
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=24]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=25]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=26]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=27]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=28]
-
 [sub_resource type="AnimationNodeStateMachineTransition" id=29]
 
-[sub_resource type="AnimationNodeStateMachine" id=30]
-states/ex/node = SubResource( 8 )
-states/ex/position = Vector2( 365, 352 )
-states/fall/node = SubResource( 9 )
-states/fall/position = Vector2( 548, 155 )
-states/idle/node = SubResource( 10 )
+[sub_resource type="AnimationNodeStateMachineTransition" id=30]
+
+[sub_resource type="AnimationNodeStateMachine" id=27]
+states/fall/node = SubResource( 8 )
+states/fall/position = Vector2( 593, 190 )
+states/idle/node = SubResource( 9 )
 states/idle/position = Vector2( 402, 102 )
-states/jump/node = SubResource( 11 )
-states/jump/position = Vector2( 548, 277 )
-states/land/node = SubResource( 12 )
+states/jump/node = SubResource( 10 )
+states/jump/position = Vector2( 641, 347 )
+states/land/node = SubResource( 11 )
 states/land/position = Vector2( 690, 102 )
 states/run/node = SubResource( 15 )
-states/run/position = Vector2( 238, 231.009 )
-transitions = [ "idle", "ex", SubResource( 16 ), "ex", "idle", SubResource( 17 ), "jump", "fall", SubResource( 18 ), "fall", "land", SubResource( 19 ), "land", "idle", SubResource( 20 ), "jump", "land", SubResource( 21 ), "ex", "jump", SubResource( 22 ), "idle", "fall", SubResource( 23 ), "ex", "fall", SubResource( 24 ), "idle", "jump", SubResource( 25 ), "idle", "run", SubResource( 26 ), "run", "idle", SubResource( 27 ), "run", "jump", SubResource( 28 ), "run", "fall", SubResource( 29 ) ]
+states/run/position = Vector2( 381, 347 )
+transitions = [ "jump", "fall", SubResource( 16 ), "fall", "land", SubResource( 17 ), "land", "idle", SubResource( 18 ), "jump", "land", SubResource( 19 ), "idle", "jump", SubResource( 20 ), "idle", "run", SubResource( 21 ), "run", "idle", SubResource( 22 ), "run", "jump", SubResource( 23 ), "run", "fall", SubResource( 29 ), "idle", "fall", SubResource( 30 ) ]
 start_node = "idle"
-graph_offset = Vector2( -18, 16.0091 )
+graph_offset = Vector2( -52.268, 16.0091 )
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id=31]
+[sub_resource type="AnimationNodeStateMachinePlayback" id=28]
 
 [node name="Player" type="KinematicBody2D"]
 collision_mask = 8
@@ -216,10 +203,10 @@ anims/land = SubResource( 6 )
 anims/run = SubResource( 7 )
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
-tree_root = SubResource( 30 )
+tree_root = SubResource( 27 )
 anim_player = NodePath("../AnimationPlayer")
 active = true
-parameters/playback = SubResource( 31 )
+parameters/playback = SubResource( 28 )
 parameters/run/TimeScale/scale = 1.0
 
 [node name="Inventory" parent="." instance=ExtResource( 3 )]

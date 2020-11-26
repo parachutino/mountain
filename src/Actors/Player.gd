@@ -116,7 +116,7 @@ func _physics_process(_delta: float) -> void:
 		# Se podria usar solo el metodo move_and_slide, pero al llegar al fin de una plataforma caeria bruscamente.
 	_velocity = move_and_slide(_velocity, FLOOR_NORMAL,
 								false, 4,
-								1.3, # Slope Angle... standard = PI/4
+								PI/2.1, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
 
@@ -139,8 +139,9 @@ func state_machine():
 			state.travel("run")
 
 		
-#	else:
-		#state.travel("fall")
+	else:
+		if terrain == "air":
+			state.travel("fall")
 	
 	if _direction.y == -1:
 		state.travel("jump")
