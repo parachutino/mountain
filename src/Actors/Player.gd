@@ -101,12 +101,12 @@ func _physics_process(_delta: float) -> void:
 	
 	get_tile_type()
 	
-	if last_terrain != terrain:
-		if debugMode: print_debug("TERRAIN CHANGED TO: ", terrain)
-		recalculate_all()
-		if debugMode: print_debug("MODIFIED SPEED FOR: ", terrain)
+#	if last_terrain != terrain:
+#		if debugMode: print_debug("TERRAIN CHANGED TO: ", terrain)
+#		recalculate_all()
+#		if debugMode: print_debug("MODIFIED SPEED FOR: ", terrain)
 		
-		
+	recalculate_all()
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
 	_velocity = calculate_move_velocity(_velocity, _direction, _modified_speed, is_jump_interrupted)
@@ -131,17 +131,19 @@ func state_machine():
 	if is_on_floor():
 		if _direction.x == 0: state.travel("idle")
 		else:
-			# animation_player.playback_speed = _modified_speed.x / speed.x
-			# print_debug("Animation Speed: ", _modified_speed.x / speed.x)
+			# Set Run Animation Speed based on velocity (average with 1 to avoid extreme speeds)
+			var animation_speed = (abs(_velocity.x / speed.x) + 1) / 2
+			$AnimationTree.set("parameters/run/TimeScale/scale", animation_speed)
+			# print_debug("Animation Speed: ", animation_speed)
+			
 			state.travel("run")
 
 		
-	else:
-		state.travel("fall")
+#	else:
+		#state.travel("fall")
 	
 	if _direction.y == -1:
 		state.travel("jump")
-		print_debug("JUMP!!!")
 
 func change_sprite(shoes, accesory):
 	
@@ -287,16 +289,7 @@ func calculate_stats():
 	snowResistance = default_snowResistance + snowResistance_modifier
 	if snowResistance < 0: snowResistance = 0 # LOW LIMIT
 	elif snowResistance > 1: snowResistance = 1 # HIGH LIMIT
-	
-	# TERRAIN ACCELERATION:
-#	for modifier in terrainAcceleration_modifier:
-#		terrainAcceleration[modifier] = default_terrainAcceleration[modifier] + terrainAcceleration_modifier[modifier]
-#		# LIMITS NOT NECESSARY... Limit on "Set Acceleration" function
-#		# if terrainAcceleration[modifier] <= 0.0: terrainAcceleration[modifier] = 0.01 # LOW LIMIT
-#		# elif terrainAcceleration[modifier] > 1.0: terrainAcceleration[modifier] = 1.0 # HIGH LIMIT
-#	# TERRAIN SPEED:
-#	for modifier in terrainSpeed_modifier:
-#		terrainSpeed[modifier] = default_terrainSpeed[modifier] + terrainSpeed_modifier[modifier]
+
 
 	if debugMode: print_debug("Calculated stats...")
 
@@ -312,8 +305,11 @@ func calculate_move_velocity(
 	var new_velocity: = linear_velocity
 	var floor_normal = get_floor_normal()
 	
-	# new_velocity.x = spd.x * direction.x
-	new_velocity.x = spd.x * (direction.x + floor_normal.x/2) # TERRAIN ANGLE AFFECTS SPEED
+	# new_velocity.x = spd.x * direction.x # ORIGINAL
+#	new_velocity.x = spd.x * (direction.x + floor_normal.x/2) # TERRAIN ANGLE AFFECTS SPEED
+	# TERRAIN ANGLE AND ACCELERATION AFFECT SPEED)
+	new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+#	print_debug("Speed * 1 + ",floor_normal.x * 0.5 - floor_normal.x * _acceleration)
 	
 	# WIND
 	if (abs(wind) - windResistance) > 0:
@@ -331,11 +327,25 @@ func calculate_move_velocity(
 	# ADDS GRAVITY MODIFIER while falling only:
 	if not is_on_floor() and new_velocity.y + gravity * gravity_modifier * get_physics_process_delta_time() > 0:
 		new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
-	else: new_velocity.y += gravity * get_physics_process_delta_time()
+	else:
+		# DEFAULT (NO TERRAIN ACCELERATION FORMULA)
+		# new_velocity.y += gravity * get_physics_process_delta_time()
+
+		# TERRAIN ACCELERATION FORMULA: REDUCES GRAVITY EFFECT ON SLOPES
+		if is_on_floor():
+			new_velocity.y += gravity * (1 - 2 * _acceleration) * get_physics_process_delta_time()
+
+		else:
+			new_velocity.y += gravity * get_physics_process_delta_time()
+		# end TERRAIN ACCELERATION FORMULA
 	
 	if direction.y == -1.0:
 		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
-		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
+#		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
+#		new_velocity.y = spd.y * (floor_normal.y - (1 + floor_normal.y) * _acceleration) # Apply floor normal to jump
+		new_velocity.y = spd.y * (floor_normal.y - (1 + floor_normal.y) * 2 * _acceleration) # Apply floor normal to jump
+#		print_debug("Jump Modifier = ", 1 * (floor_normal.y - (1 + floor_normal.y) * 2 * _acceleration))
+#		print_debug("Acceleration = ", _acceleration)
 		
 		"""JUMP gets more impulse or less penalty in X from FLOOR NORMAL depending on floor acceleration"""
 		# print_debug("Velocidad: ",new_velocity.x)
@@ -378,7 +388,7 @@ func set_acceleration():
 		accel = accel + 0.25 * weatherSize
 		if debugMode: print_debug("RACKETS ACCELERATION")
 	
-	if accel > 1: accel = 1 # HIGH LIMIT
+	if accel > 0.5: accel = 0.5 # HIGH LIMIT
 	elif accel <= 0: accel = 0.005 # LOW LIMIT
 	
 	if debugMode: print_debug("Set Acceleration: ", accel)
@@ -426,7 +436,8 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 	last_terrain = terrain
 	
 	if is_on_floor():
-		var collision = get_slide_collision(0)
+#		var collision = get_slide_collision(0) # FIRST COLLISION
+		var collision = get_slide_collision(get_slide_count()-1) # LAST COLLISION
 		if collision.collider is TileMap:
 			# Find the character's position in tile coordinates
 			var tile_pos = collision.collider.world_to_map(position)
