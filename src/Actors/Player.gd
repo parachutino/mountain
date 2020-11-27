@@ -306,11 +306,13 @@ func calculate_move_velocity(
 	var new_velocity: = linear_velocity
 	var floor_normal = get_floor_normal()
 	
-	# new_velocity.x = spd.x * direction.x # ORIGINAL
-#	new_velocity.x = spd.x * (direction.x + floor_normal.x/2) # TERRAIN ANGLE AFFECTS SPEED
-	# TERRAIN ANGLE AND ACCELERATION AFFECT SPEED)
+	# DEFAULT FORMULA
+	# new_velocity.x = spd.x * direction.x 
+	# TERRAIN ANGLE AFFECTS SPEED
+	# new_velocity.x = spd.x * (direction.x + floor_normal.x/2)
+	# TERRAIN ANGLE AND ACCELERATION AFFECT SPEED X)
 	new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
-#	print_debug("Speed * 1 + ",floor_normal.x * 0.5 - floor_normal.x * _acceleration)
+#	print_debug("Speed * (", direction.x, " + ", floor_normal.x * 0.5, " - ", floor_normal.x * _acceleration,")")
 	
 	# WIND
 	if (abs(wind) - windResistance) > 0:
@@ -320,9 +322,10 @@ func calculate_move_velocity(
 	# ACCELERATION: Gradually accelerate / brake
 	new_velocity.x = linear_velocity.x + (new_velocity.x - linear_velocity.x) * _acceleration
  
+
 	# JUMP (IMPORTANT: DELTA) 
 	
-	# DEFAULT GAVITY FORMULA
+	# DEFAULT GRAVITY FORMULA
 	# new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time() 
 
 	# ADDS GRAVITY MODIFIER while falling only:
@@ -330,7 +333,7 @@ func calculate_move_velocity(
 		new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
 	else:
 		# DEFAULT (NO TERRAIN ACCELERATION FORMULA)
-		# new_velocity.y += gravity * get_physics_process_delta_time()
+#		new_velocity.y += gravity * get_physics_process_delta_time()
 
 		# TERRAIN ACCELERATION FORMULA: REDUCES GRAVITY EFFECT ON SLOPES
 		if is_on_floor():
