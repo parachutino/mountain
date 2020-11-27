@@ -43,7 +43,7 @@ export var terrainSpeed: Dictionary = {
 	"grass" : Vector2(1, 1),
 	"stone" : Vector2(1, 1),
 	"ice": Vector2(1, 1),
-	"snow": Vector2(0.5, 0.5)
+	"snow": Vector2(0.5, 1) # jump 0.5 makes player get stuck on snow slopes....
 	}
 
 
@@ -55,6 +55,8 @@ var _direction: = Vector2.ZERO
 var _velocity: = Vector2.ZERO
 var _acceleration: float = 0.25
 var _modified_speed: Vector2 = speed
+var _snap
+var _floor_normal
 
 var terrain: String = "air"
 var last_terrain: String = "normal"
@@ -97,15 +99,11 @@ func _process(delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 		
 	var is_jump_interrupted: = Input.is_action_just_released("jump") and _velocity.y < 0.0 # Interrupts jump if button released
+
 	_direction = get_direction() # Gets input from keyboard / joystick
 	
 	get_tile_type()
 	
-#	if last_terrain != terrain:
-#		if debugMode: print_debug("TERRAIN CHANGED TO: ", terrain)
-#		recalculate_all()
-#		if debugMode: print_debug("MODIFIED SPEED FOR: ", terrain)
-		
 	recalculate_all()
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
@@ -114,14 +112,35 @@ func _physics_process(_delta: float) -> void:
 	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
 		# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
 		# Se podria usar solo el metodo move_and_slide, pero al llegar al fin de una plataforma caeria bruscamente.
-	_velocity = move_and_slide(_velocity, FLOOR_NORMAL,
-								false, 4,
-								PI/2.1, # Slope Angle... standard = PI/4
+
+	_floor_normal = get_floor_normal()
+
+#	var snap_vector = Vector2(0,5) if is_on_floor() and (_direction.y != 0 or terrain != "air") else Vector2(0,0)
+	var snap_vector = Vector2(0,5) if is_on_floor() and check_snap() else Vector2(0,0)
+	
+	_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL,
+								true, # Stop on Slope
+								2, # Max Slides
+								PI/2.5, # Slope Angle... standard = PI/4
 								false # No Infinite Inertia (for correct interaction with RigidBody2D)
 								)
+#
+#	_velocity = move_and_slide(_velocity, FLOOR_NORMAL,
+#								false, # Stop on Slope
+#								4, # Max Slides
+#								PI/2.1, # Slope Angle... standard = PI/4
+#								false # No Infinite Inertia (for correct interaction with RigidBody2D)
+#								)
 
 	state_machine() #APPLY STATE ANIMATION
 
+func check_snap():
+	
+		# SNAPS ONLY IF GOING UP ON SLOPE
+	if abs(player.scale.x + _floor_normal.x ) < 0.5 and abs(player.scale.x + _floor_normal.x ) > 0.1 and not Input.is_action_pressed("jump"):
+		return true
+	else:
+		return false
 
 func state_machine():
 	
@@ -311,8 +330,12 @@ func calculate_move_velocity(
 	# TERRAIN ANGLE AFFECTS SPEED
 	# new_velocity.x = spd.x * (direction.x + floor_normal.x/2)
 	# TERRAIN ANGLE AND ACCELERATION AFFECT SPEED X)
-	new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+#	new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+	# TERRAIN ANGLE AND ACCELERATION ONLY WHILE GOING UP IN SLOPES
+	if abs(direction.x + floor_normal.x ) < 0.5: new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+	else: new_velocity.x = spd.x * direction.x#	
 #	print_debug("Speed * (", direction.x, " + ", floor_normal.x * 0.5, " - ", floor_normal.x * _acceleration,")")
+#	print_debug("Dir: ",direction, "Normal: ", floor_normal)
 	
 	# WIND
 	if (abs(wind) - windResistance) > 0:
@@ -442,7 +465,7 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 	if is_on_floor():
 #		var collision = get_slide_collision(0) # FIRST COLLISION
 		var collision = get_slide_collision(get_slide_count()-1) # LAST COLLISION
-		if collision.collider is TileMap:
+		if collision and collision.collider is TileMap:
 			# Find the character's position in tile coordinates
 			var tile_pos = collision.collider.world_to_map(position)
 			#tile_pos -= collision.normal # Find the colliding tile position
@@ -465,6 +488,7 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 				
 	else: current_tile = "air" # Acceleration on air
 	
+	if not current_tile: current_tile = "unknown"
 	terrain = current_tile
 	return current_tile
 
