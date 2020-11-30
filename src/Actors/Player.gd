@@ -43,7 +43,7 @@ export var terrainSpeed: Dictionary = {
 	"grass" : Vector2(1, 1),
 	"stone" : Vector2(1, 1),
 	"ice": Vector2(1, 1),
-	"snow": Vector2(0.5, 1) # jump 0.5 makes player get stuck on snow slopes....
+	"snow": Vector2(0.5, 0.5) # jump 0.5 makes player get stuck on snow slopes....
 	}
 
 
@@ -104,20 +104,20 @@ func _physics_process(_delta: float) -> void:
 	
 	get_tile_type()
 	
+	_floor_normal = get_floor_normal()
+	
 	recalculate_all()
 	
 	# Calcula la velocidad de movimiento del KinematicBody2D y la asigna a la variable _velocity
 	_velocity = calculate_move_velocity(_velocity, _direction, _modified_speed, is_jump_interrupted)
-	
-	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
-		# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
-		# Se podria usar solo el metodo move_and_slide, pero al llegar al fin de una plataforma caeria bruscamente.
-
-	_floor_normal = get_floor_normal()
 
 #	var snap_vector = Vector2(0,5) if is_on_floor() and (_direction.y != 0 or terrain != "air") else Vector2(0,0)
 	var snap_vector = Vector2(0,5) if is_on_floor() and check_snap() else Vector2(0,0)
 	
+	# Hace moverse el "KinematicBody2D" con lógica de plataformas (colision con plataformas) usando la _velocity calculada anteriormente
+	# IMPORTANTE: Se redefine la "_velocity" anulando la gravedad si esta sobre una plataforma...
+	# Se podria usar solo el metodo move_and_slide, pero al llegar al fin de una plataforma caeria bruscamente.
+
 	_velocity = move_and_slide_with_snap(_velocity, snap_vector, FLOOR_NORMAL,
 								true, # Stop on Slope
 								2, # Max Slides
@@ -332,8 +332,12 @@ func calculate_move_velocity(
 	# TERRAIN ANGLE AND ACCELERATION AFFECT SPEED X)
 #	new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
 	# TERRAIN ANGLE AND ACCELERATION ONLY WHILE GOING UP IN SLOPES
-	if abs(direction.x + floor_normal.x ) < 0.5: new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
-	else: new_velocity.x = spd.x * direction.x#	
+#	if abs(direction.x + floor_normal.x ) < 0.5: new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+#	if abs(direction.x + floor_normal.x ) < 0.5 and abs(direction.x + floor_normal.x ) > 0:
+	if abs(direction.x) - abs(floor_normal.x ) < 0.5 and abs(direction.x) - abs(floor_normal.x ) > 0:
+		new_velocity.x = spd.x * (direction.x + floor_normal.x * 0.5 - floor_normal.x * _acceleration) # TERRAIN ANGLE AFFECTS SPEED
+	else:
+		new_velocity.x = spd.x * direction.x#	
 #	print_debug("Speed * (", direction.x, " + ", floor_normal.x * 0.5, " - ", floor_normal.x * _acceleration,")")
 #	print_debug("Dir: ",direction, "Normal: ", floor_normal)
 	
@@ -349,23 +353,27 @@ func calculate_move_velocity(
 	# JUMP (IMPORTANT: DELTA) 
 	
 	# DEFAULT GRAVITY FORMULA
-	# new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time() 
+	# new_velocity.y += gravity * get_physics_process_delta_time() 
 
-	# ADDS GRAVITY MODIFIER while falling only:
-	if not is_on_floor() and new_velocity.y + gravity * gravity_modifier * get_physics_process_delta_time() > 0:
-		new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
-	else:
-		# DEFAULT (NO TERRAIN ACCELERATION FORMULA)
-#		new_velocity.y += gravity * get_physics_process_delta_time()
-
+	
+	if is_on_floor():
 		# TERRAIN ACCELERATION FORMULA: REDUCES GRAVITY EFFECT ON SLOPES
-		if is_on_floor():
-			new_velocity.y += gravity * (1 - 2 * _acceleration) * get_physics_process_delta_time()
+#		new_velocity.y += gravity * get_physics_process_delta_time()
+		new_velocity.y += gravity * (1 - 2 * _acceleration) * get_physics_process_delta_time()
+
+#		print_debug(1 - 2 * _acceleration)
+		
+	else:
+		# ADDS GRAVITY MODIFIER while falling only:
+		if new_velocity.y + gravity * gravity_modifier * get_physics_process_delta_time() > 0:
+			new_velocity.y += gravity * gravity_modifier * get_physics_process_delta_time()
 
 		else:
+			# DEFAULT (NO TERRAIN ACCELERATION FORMULA)... Used only on air
 			new_velocity.y += gravity * get_physics_process_delta_time()
 		# end TERRAIN ACCELERATION FORMULA
-	
+
+
 	if direction.y == -1.0:
 		# new_velocity.y = spd.y * direction.y # (ORIGINAL, no floor normal...)
 #		new_velocity.y = spd.y * floor_normal.y # Apply floor normal to jump
@@ -405,6 +413,10 @@ func get_direction() -> Vector2:
 func set_acceleration():
 	
 	var accel = (terrainAcceleration[terrain] + terrainAcceleration_modifier[terrain]) * acceleration_modifier
+	
+	# SLIDE MORE ON SLOPES...
+	if abs(_floor_normal.y) > 0:
+		accel = accel * abs(_floor_normal.y)
 	
 	# RAIN AFFECTS ACCELERATION
 	if weather == "rain":
@@ -463,8 +475,8 @@ func get_tile_type(): #sets terrain variable and returns tile_type
 	last_terrain = terrain
 	
 	if is_on_floor():
-#		var collision = get_slide_collision(0) # FIRST COLLISION
-		var collision = get_slide_collision(get_slide_count()-1) # LAST COLLISION
+#		var collision = get_slide_collision(0) if get_slide_count() > 0 else null # FIRST COLLISION
+		var collision = get_slide_collision(get_slide_count()-1) if get_slide_count() > 0 else null # LAST COLLISION
 		if collision and collision.collider is TileMap:
 			# Find the character's position in tile coordinates
 			var tile_pos = collision.collider.world_to_map(position)
