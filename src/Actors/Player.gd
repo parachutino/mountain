@@ -148,7 +148,11 @@ func state_machine():
 	elif _direction.x < 0: player.scale.x = -1
 	
 	if is_on_floor():
-		if _direction.x == 0: state.travel("idle")
+		if _direction.x == 0:
+			state.travel("idle")
+			# SEEDS HAT ANIMATION WHEN IDLE ACCORDING TO WIND
+			var animation_speed = 2 + 6 * abs(wind)
+			$AnimationTree.set("parameters/idle/TimeScale/scale", animation_speed)
 		else:
 			# Set Run Animation Speed based on velocity (average with 1 to avoid extreme speeds)
 			var animation_speed = (abs(_velocity.x / speed.x) + 1) / 2

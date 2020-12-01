@@ -115,6 +115,9 @@ __meta__ = {
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 33, 248 )
 
+[node name="player" parent="Player" index="0"]
+frame = 0
+
 [node name="Camera2D" parent="Player" index="2"]
 position = Vector2( 0, -70 )
 limit_right = 3680
@@ -149,7 +152,7 @@ margin_left = 232.323
 margin_top = 14.9449
 margin_right = 332.323
 margin_bottom = 66.9452
-weatherType = "clear"
+weatherType = "rain"
 wind = -0.364
 size = 0.705
 
@@ -173,6 +176,8 @@ margin_left = 485.05
 margin_top = 163.232
 margin_right = 563.05
 margin_bottom = 206.232
-weatherType = "clear"
+weatherType = "snow"
+wind = -0.364
+size = 0.724
 
 [editable path="Player"]
