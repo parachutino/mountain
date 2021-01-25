@@ -50,3 +50,4 @@ margin_bottom = 77.0
 [node name="Title" parent="." instance=ExtResource( 3 )]
 margin_top = 65.3583
 margin_bottom = 122.358
+text = "Mountain"

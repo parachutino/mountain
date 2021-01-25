@@ -179,7 +179,7 @@ stomp_impulse = 250.0
 position = Vector2( 0, -21.5 )
 texture = ExtResource( 1 )
 hframes = 15
-frame = 2
+frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -14.5 )
@@ -222,6 +222,9 @@ parameters/idle/TimeScale/scale = 1.0
 parameters/run/TimeScale/scale = 1.0
 
 [node name="Inventory" parent="." instance=ExtResource( 3 )]
+margin_top = -17.0
+margin_bottom = -17.0
+rect_pivot_offset = Vector2( 0, 0 )
 [connection signal="area_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_area_entered"]
 [connection signal="body_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_body_entered"]
 

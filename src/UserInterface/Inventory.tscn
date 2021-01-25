@@ -1,10 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://src/UserInterface/Inventory.gd" type="Script" id=1]
-[ext_resource path="res://assets/accesories/hiking_ico.png" type="Texture" id=2]
-[ext_resource path="res://assets/accesories/crampons_ico.png" type="Texture" id=3]
-[ext_resource path="res://assets/accesories/rackets_ico.png" type="Texture" id=4]
-[ext_resource path="res://assets/accesories/climbing_ico.png" type="Texture" id=5]
+[ext_resource path="res://src/UserInterface/ShoesMenu.tscn" type="PackedScene" id=2]
 
 [node name="Inventory" type="Control"]
 grow_horizontal = 2
@@ -19,9 +16,12 @@ __meta__ = {
 [node name="ShoesLabel" type="Label" parent="."]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_top = -120.0
-margin_bottom = -106.0
+margin_left = 32.6222
+margin_top = -70.0
+margin_right = 114.622
+margin_bottom = -56.0
 grow_horizontal = 2
+text = "Hiking Shoes"
 align = 1
 __meta__ = {
 "_edit_use_anchors_": false
@@ -30,27 +30,16 @@ __meta__ = {
 [node name="AccesoryLabel" type="Label" parent="."]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_top = -100.0
-margin_bottom = -86.0
+margin_left = 32.6783
+margin_top = -50.0
+margin_right = 112.678
+margin_bottom = -36.0
 grow_horizontal = 2
+text = "No Accesory"
 align = 1
 valign = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="hiking_ico" type="Sprite" parent="."]
-position = Vector2( 0, -60 )
-texture = ExtResource( 2 )
-
-[node name="crampons_ico" type="Sprite" parent="."]
-position = Vector2( -60, 0 )
-texture = ExtResource( 3 )
-
-[node name="climbing_ico" type="Sprite" parent="."]
-position = Vector2( 60, 0 )
-texture = ExtResource( 5 )
-
-[node name="rackets_ico" type="Sprite" parent="."]
-position = Vector2( 0, 60 )
-texture = ExtResource( 4 )
+[node name="ShoesMenu" parent="." instance=ExtResource( 2 )]

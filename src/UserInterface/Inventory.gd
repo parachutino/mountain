@@ -22,7 +22,42 @@ var item: Dictionary
 func _ready() -> void:
 	_generate_item_list()
 
+func _process(delta: float) -> void:
+	inventory_UI()
+	
+func inventory_UI() -> void:
+		# JOYSTICK Right Stick
+	var select = Vector2(
+		Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
+		Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
+		)
+	
+	# print_debug(select)
+	"""
+	# NORMALIZE Right Stick
+	if select.x > 0.5: select.x = 1
+	elif select.x < -0.5: select.x = -1
+	else: select.x = 0
+	if select.y > 0.5: select.y = 1
+	elif select.y < -0.5: select.y = -1
+	else: select.y = 0
+	"""
+	
+	
+	# JOYSTICK CHANGE
+	if select == Vector2(-1,0): shoes_changed(shoesInventory[0])
+	if select == Vector2(0,1): shoes_changed(shoesInventory[1])
+	if select == Vector2(1,0): shoes_changed(shoesInventory[2])
+	if select == Vector2(0,-1): shoes_changed(shoesInventory[3])
 
+	
+	
+"""
+	if select == Vector2(1,0): inventory.accesory = inventory.accesoryInventory[0]
+	if select == Vector2(1,-1): inventory.accesory = inventory.accesoryInventory[1]
+	if select == Vector2(0,-1): inventory.accesory = inventory.accesoryInventory[2]
+	if select == Vector2(-1,-1): inventory.accesory = inventory.accesoryInventory[3]
+"""
 class player_item:
 	
 	var name = "nothing"

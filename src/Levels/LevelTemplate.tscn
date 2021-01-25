@@ -116,7 +116,7 @@ __meta__ = {
 position = Vector2( 33, 248 )
 
 [node name="player" parent="Player" index="0"]
-frame = 0
+frame = 1
 
 [node name="Camera2D" parent="Player" index="2"]
 position = Vector2( 0, -70 )
@@ -152,9 +152,9 @@ margin_left = 232.323
 margin_top = 14.9449
 margin_right = 332.323
 margin_bottom = 66.9452
-weatherType = "rain"
-wind = -0.364
-size = 0.705
+weatherType = "snow"
+wind = -0.485
+size = 0.773
 
 [node name="WeatherControl3" parent="." instance=ExtResource( 5 )]
 margin_left = 236.818

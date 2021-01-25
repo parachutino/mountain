@@ -189,33 +189,6 @@ func temp_UI(): # UI TEMPORANEA CON TASTIERA E JOYSTICK
 	if Input.is_action_just_pressed("select_accesory_1"): inventory.accesory = inventory.accesoryInventory[1]
 	if Input.is_action_just_pressed("select_accesory_2"): inventory.accesory = inventory.accesoryInventory[2]
 	if Input.is_action_just_pressed("select_accesory_3"): inventory.accesory = inventory.accesoryInventory[3]
-	
-	# JOYSTICK Right Stick
-	var select = Vector2(
-		Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
-		Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
-		)
-	
-	# NORMALIZE Right Stick
-	if select.x > 0.5: select.x = 1
-	elif select.x < -0.5: select.x = -1
-	else: select.x = 0
-	if select.y > 0.5: select.y = 1
-	elif select.y < -0.5: select.y = -1
-	else: select.y = 0
-	
-	# print_debug(select)
-	
-	# KEYBOARD GTYU GHJK
-	if select == Vector2(-1,0): inventory.shoes = inventory.shoesInventory[0]
-	if select == Vector2(-1,1): inventory.shoes = inventory.shoesInventory[1]
-	if select == Vector2(0,1): inventory.shoes = inventory.shoesInventory[2]
-	if select == Vector2(1,1): inventory.shoes = inventory.shoesInventory[3]
-	if select == Vector2(1,0): inventory.accesory = inventory.accesoryInventory[0]
-	if select == Vector2(1,-1): inventory.accesory = inventory.accesoryInventory[1]
-	if select == Vector2(0,-1): inventory.accesory = inventory.accesoryInventory[2]
-	if select == Vector2(-1,-1): inventory.accesory = inventory.accesoryInventory[3]
-
 
 
 """STATS FUNCTIONS"""
