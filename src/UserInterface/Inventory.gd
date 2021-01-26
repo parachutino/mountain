@@ -7,14 +7,15 @@ extends Control
 
 onready var shoes_label = $ShoesLabel
 onready var acccesory_label = $AccesoryLabel	
+onready var shoesMenu = $ShoesMenu
 
 onready var player = get_parent()
-
+export var deadzone = 0.2
 export (String, "Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets") onready var shoes = "Nothing" setget shoes_changed
 export (String, "Nothing", "Rain Coat", "Jumping Tool", "Parachute") onready var accesory = "Nothing" setget accesory_changed
 
 var shoesInventory = ["Nothing", "Climbing Shoes", "Ice Crampons", "Snow Rackets"]
-var accesoryInventory =  ["Nothing", "Rain Coat", "Jumping Tool", "Parachute"]
+var accesoryInventory =  ["Nothing", "Rain Coat", "Parachute", "Jumping Tool"]
 
 var item: Dictionary 
 
@@ -27,37 +28,47 @@ func _process(delta: float) -> void:
 	
 func inventory_UI() -> void:
 		# JOYSTICK Right Stick
+
+
 	var select = Vector2(
 		Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
 		Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
 		)
 	
-	# print_debug(select)
-	"""
-	# NORMALIZE Right Stick
-	if select.x > 0.5: select.x = 1
-	elif select.x < -0.5: select.x = -1
-	else: select.x = 0
-	if select.y > 0.5: select.y = 1
-	elif select.y < -0.5: select.y = -1
-	else: select.y = 0
-	"""
+	# DEFINE SELECTION STRENGTH
+	var strength = max(abs(select.x), abs(select.y))
 	
+	# DEADZONE returns...
+	if strength < deadzone:
+		if shoesMenu.visible == true: shoesMenu.visible = false
+		return 
+	
+	# print_debug(select)
 	
 	# JOYSTICK CHANGE
-	if select == Vector2(-1,0): shoes_changed(shoesInventory[0])
-	if select == Vector2(0,1): shoes_changed(shoesInventory[1])
-	if select == Vector2(1,0): shoes_changed(shoesInventory[2])
-	if select == Vector2(0,-1): shoes_changed(shoesInventory[3])
+	
+	# Selects opion 0,1,2,3 depending on strengths of axises x and y
+	var selected: int
+	if abs(select.x) > abs(select.y): # SELECT X Axis
+		if select.x < 0: selected = 0 # selected Left
+		else: selected = 1 # selected Right
+	else: # SELECT Y AXIS
+		if select.y > 0: selected = 2 # selected Up
+		else: selected = 3 # selected Down
+	
 
+	if Input.is_action_pressed("menu"):
+		shoesMenu.visible = true
+		shoes_changed(shoesInventory[selected])
+		for node in shoesMenu.get_children():
+			if node == shoesMenu.get_child(selected):
+				node.modulate = "ffffffff"
+			else: node.modulate = "80ffffff"
+
+	else:
+		accesory_changed(accesoryInventory[selected])
 	
-	
-"""
-	if select == Vector2(1,0): inventory.accesory = inventory.accesoryInventory[0]
-	if select == Vector2(1,-1): inventory.accesory = inventory.accesoryInventory[1]
-	if select == Vector2(0,-1): inventory.accesory = inventory.accesoryInventory[2]
-	if select == Vector2(-1,-1): inventory.accesory = inventory.accesoryInventory[3]
-"""
+
 class player_item:
 	
 	var name = "nothing"

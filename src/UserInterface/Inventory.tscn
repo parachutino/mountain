@@ -43,3 +43,5 @@ __meta__ = {
 }
 
 [node name="ShoesMenu" parent="." instance=ExtResource( 2 )]
+
+[editable path="ShoesMenu"]
