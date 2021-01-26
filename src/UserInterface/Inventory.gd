@@ -8,6 +8,9 @@ extends Control
 onready var shoes_label = $ShoesLabel
 onready var acccesory_label = $AccesoryLabel	
 onready var shoesMenu = $ShoesMenu
+onready var accesoryMenu = $AccesoryMenu
+var lastShoes = 0
+var lastAccesory = 0
 
 onready var player = get_parent()
 export var deadzone = 0.2
@@ -25,29 +28,48 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	inventory_UI()
-	
+
+
 func inventory_UI() -> void:
-		# JOYSTICK Right Stick
+	# JOYSTICK Right Stick
 
+	# print_debug(select)
 
-	var select = Vector2(
-		Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
-		Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
-		)
+	if Input.is_action_pressed("menu"):
+		
+		# ACCESORY MENU
+		shoesMenu.visible = false
+		if Input.is_action_pressed("trigger"):
+			accesoryMenu.visible = true
+			accesory_changed(accesoryInventory[radial_menu(accesoryMenu)])
+		elif accesoryMenu.visible == true: accesoryMenu.visible = false
+
+		# SHOES MENU
+		else:
+			shoesMenu.visible = true
+			shoes_changed(shoesInventory[radial_menu(shoesMenu)])
+	elif shoesMenu.visible == true: shoesMenu.visible = false
+	elif accesoryMenu.visible == true: accesoryMenu.visible = false
+
+func radial_menu(menu):
 	
+	# JOYSTICK SELECT
+	
+	var select = Vector2(
+	Input.get_action_strength("select_right")-Input.get_action_strength("select_left"),
+	Input.get_action_strength("select_up")-Input.get_action_strength("select_down")
+	)
+
 	# DEFINE SELECTION STRENGTH
 	var strength = max(abs(select.x), abs(select.y))
-	
-	# DEADZONE returns...
+
+	# DEADZONE returns last...
 	if strength < deadzone:
-		if shoesMenu.visible == true: shoesMenu.visible = false
-		return 
-	
-	# print_debug(select)
-	
-	# JOYSTICK CHANGE
-	
-	# Selects opion 0,1,2,3 depending on strengths of axises x and y
+		if menu == shoesMenu: return lastShoes
+		elif menu == accesoryMenu: return lastAccesory
+		else: return 0
+		
+# Selects opion 0,1,2,3 depending on strengths of axises x and y
 	var selected: int
 	if abs(select.x) > abs(select.y): # SELECT X Axis
 		if select.x < 0: selected = 0 # selected Left
@@ -56,18 +78,16 @@ func inventory_UI() -> void:
 		if select.y > 0: selected = 2 # selected Up
 		else: selected = 3 # selected Down
 	
-
-	if Input.is_action_pressed("menu"):
-		shoesMenu.visible = true
-		shoes_changed(shoesInventory[selected])
-		for node in shoesMenu.get_children():
-			if node == shoesMenu.get_child(selected):
-				node.modulate = "ffffffff"
-			else: node.modulate = "80ffffff"
-
-	else:
-		accesory_changed(accesoryInventory[selected])
+	for node in menu.get_children():
+		if node == menu.get_child(selected): node.modulate = "ffffffff"
+		else: node.modulate = "80ffffff"
 	
+	# Sets LAST variable
+	if menu == shoesMenu: lastShoes = selected
+	elif menu == accesoryMenu: lastAccesory = selected
+	
+	return selected
+
 
 class player_item:
 	
