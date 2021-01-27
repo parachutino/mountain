@@ -35,19 +35,19 @@ func inventory_UI() -> void:
 
 	# print_debug(select)
 
-	if Input.is_action_pressed("menu"):
-		
-		# ACCESORY MENU
-		shoesMenu.visible = false
-		if Input.is_action_pressed("trigger"):
-			accesoryMenu.visible = true
-			accesory_changed(accesoryInventory[radial_menu(accesoryMenu)])
-		elif accesoryMenu.visible == true: accesoryMenu.visible = false
+	# SHOES MENU
+	if Input.is_action_pressed("shoes_menu"):
+		if accesoryMenu.visible == true: accesoryMenu.visible = false
+		shoesMenu.visible = true
+		shoes_changed(shoesInventory[radial_menu(shoesMenu)])
+	
+	# ACCESORY MENU
+	elif Input.is_action_pressed("accesory_menu"):
+		if shoesMenu.visible == true: shoesMenu.visible = false
+		accesoryMenu.visible = true
+		accesory_changed(accesoryInventory[radial_menu(accesoryMenu)])
 
-		# SHOES MENU
-		else:
-			shoesMenu.visible = true
-			shoes_changed(shoesInventory[radial_menu(shoesMenu)])
+	# TURN OFF MENU
 	elif shoesMenu.visible == true: shoesMenu.visible = false
 	elif accesoryMenu.visible == true: accesoryMenu.visible = false
 
