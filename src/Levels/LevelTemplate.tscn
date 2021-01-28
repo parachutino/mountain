@@ -115,6 +115,24 @@ __meta__ = {
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 33, 248 )
 
+[node name="jumpingTool" parent="Player/player" index="1"]
+frame = 1
+
+[node name="player" parent="Player/player" index="2"]
+frame = 1
+
+[node name="parachuteBag" parent="Player/player" index="3"]
+frame = 1
+
+[node name="gorrito" parent="Player/player" index="4"]
+frame = 1
+
+[node name="sleepingBag" parent="Player/player" index="5"]
+frame = 1
+
+[node name="rainCoat" parent="Player/player" index="6"]
+frame = 1
+
 [node name="Camera2D" parent="Player" index="2"]
 position = Vector2( 0, -70 )
 limit_right = 3680

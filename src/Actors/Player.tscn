@@ -21,7 +21,7 @@ resource_name = "fall"
 length = 0.2
 loop = true
 tracks/0/type = "value"
-tracks/0/path = NodePath("player:frame")
+tracks/0/path = NodePath("player/player:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/imported = false
@@ -98,7 +98,7 @@ length = 1.6
 loop = true
 step = 0.2
 tracks/0/type = "value"
-tracks/0/path = NodePath("player:frame")
+tracks/0/path = NodePath("player/player:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/imported = false
@@ -174,7 +174,7 @@ tracks/5/keys = {
 resource_name = "jump"
 length = 0.4
 tracks/0/type = "value"
-tracks/0/path = NodePath("player:frame")
+tracks/0/path = NodePath("player/player:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/imported = false
@@ -250,7 +250,7 @@ tracks/5/keys = {
 resource_name = "land"
 length = 0.1
 tracks/0/type = "value"
-tracks/0/path = NodePath("player:frame")
+tracks/0/path = NodePath("player/player:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/imported = false
@@ -327,7 +327,7 @@ length = 0.6
 loop = true
 step = 0.15
 tracks/0/type = "value"
-tracks/0/path = NodePath("player:frame")
+tracks/0/path = NodePath("player/player:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = false
 tracks/0/imported = false
@@ -481,45 +481,52 @@ collision_mask = 8
 script = ExtResource( 2 )
 stomp_impulse = 250.0
 
-[node name="player" type="Sprite" parent="."]
-position = Vector2( 0, -21.5 )
-texture = ExtResource( 1 )
-hframes = 15
-frame = 1
-
-[node name="parachuteBag" type="Sprite" parent="player"]
-visible = false
-texture = ExtResource( 8 )
-hframes = 15
-frame = 1
-
-[node name="gorrito" type="Sprite" parent="player"]
-texture = ExtResource( 4 )
-hframes = 15
-frame = 1
-
-[node name="sleepingBag" type="Sprite" parent="player"]
-texture = ExtResource( 6 )
-hframes = 15
-frame = 1
-
-[node name="jumpingTool" type="Sprite" parent="player"]
-visible = false
-z_index = 1
-texture = ExtResource( 7 )
-hframes = 15
-frame = 1
-
-[node name="rainCoat" type="Sprite" parent="player"]
-visible = false
-texture = ExtResource( 5 )
-hframes = 15
-frame = 1
+[node name="player" type="Node2D" parent="."]
 
 [node name="parachute" type="Sprite" parent="player"]
 visible = false
-position = Vector2( -8.4731, -14.3919 )
+position = Vector2( -2.50282, -39.1657 )
 texture = ExtResource( 9 )
+
+[node name="jumpingTool" type="Sprite" parent="player"]
+visible = false
+position = Vector2( 0, -21.5 )
+z_index = 1
+texture = ExtResource( 7 )
+hframes = 15
+frame = 2
+
+[node name="player" type="Sprite" parent="player"]
+position = Vector2( 0, -21.5 )
+texture = ExtResource( 1 )
+hframes = 15
+frame = 2
+
+[node name="parachuteBag" type="Sprite" parent="player"]
+visible = false
+position = Vector2( 0, -21.5 )
+texture = ExtResource( 8 )
+hframes = 15
+frame = 2
+
+[node name="gorrito" type="Sprite" parent="player"]
+position = Vector2( 0, -21.5 )
+texture = ExtResource( 4 )
+hframes = 15
+frame = 2
+
+[node name="sleepingBag" type="Sprite" parent="player"]
+position = Vector2( 0, -21.5 )
+texture = ExtResource( 6 )
+hframes = 15
+frame = 2
+
+[node name="rainCoat" type="Sprite" parent="player"]
+visible = false
+position = Vector2( 0, -21.5 )
+texture = ExtResource( 5 )
+hframes = 15
+frame = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -14.5 )

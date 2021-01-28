@@ -5,7 +5,7 @@ const FLOOR_NORMAL: = Vector2.UP
 
 onready var state = $AnimationTree.get("parameters/playback")
 onready var animation_player = $AnimationPlayer
-onready var player = $player
+onready var player = $player/player
 onready var inventory = $Inventory
 
 # NOT PUBLIC, set from Inventory
@@ -146,8 +146,8 @@ func state_machine():
 	
 	var parachute = $player/parachute
 	
-	if _direction.x > 0: player.scale.x = 1
-	elif _direction.x < 0: player.scale.x = -1
+	if _direction.x > 0: $player.scale.x = 1
+	elif _direction.x < 0: $player.scale.x = -1
 	
 	if is_on_floor():
 		
