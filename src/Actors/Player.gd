@@ -171,7 +171,40 @@ func state_machine():
 
 func change_sprite(shoes, accesory):
 	
+	print_debug("Changing Accesory to: ", accesory)
+	
+	var gorrito = $player/gorrito.visible
+	var sleepingBag = $player/sleepingBag.visible
+	var jumpingTool = $player/jumpingTool.visible
+	var rainCoat = $player/rainCoat.visible
+	
 	player.set_texture(playerSpritesNormal[shoes])
+	
+	if accesory == "Nothing":
+		gorrito = true
+		sleepingBag = true
+		jumpingTool = false
+		rainCoat = false
+		
+	elif accesory == "Rain Coat":
+		gorrito = false
+		sleepingBag = false
+		jumpingTool = false
+		rainCoat = true
+	
+	elif accesory == "Jumping Tool":
+		gorrito = true
+		sleepingBag = false
+		jumpingTool = true
+		rainCoat = false
+
+"""
+	elif accesory == "Parachute":
+		gorrito = false
+		sleepingBag = false
+		jupingTool = false
+		rainCoat = true
+"""
 
 func recalculate_all():
 	calculate_stats()
@@ -539,6 +572,7 @@ func accesory_changed(new_accesory):
 	
 		if debugMode: print_debug("No accesory equipped")
 
+	change_sprite(shoes, new_accesory)
 
 
 """SIGNAL FUNCTIONS"""
