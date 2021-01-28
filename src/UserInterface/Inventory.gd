@@ -39,17 +39,25 @@ func inventory_UI() -> void:
 	if Input.is_action_pressed("shoes_menu"):
 		if accesoryMenu.visible == true: accesoryMenu.visible = false
 		shoesMenu.visible = true
-		shoes_changed(shoesInventory[radial_menu(shoesMenu)])
+		radial_menu(shoesMenu)
 	
 	# ACCESORY MENU
 	elif Input.is_action_pressed("accesory_menu"):
 		if shoesMenu.visible == true: shoesMenu.visible = false
 		accesoryMenu.visible = true
-		accesory_changed(accesoryInventory[radial_menu(accesoryMenu)])
-
+		radial_menu(accesoryMenu)
+		
 	# TURN OFF MENU
-	elif shoesMenu.visible == true: shoesMenu.visible = false
-	elif accesoryMenu.visible == true: accesoryMenu.visible = false
+
+	elif Input.is_action_just_released("shoes_menu"):
+		shoes_changed(shoesInventory[radial_menu(shoesMenu)])
+		shoesMenu.visible = false
+		
+	elif Input.is_action_just_released("accesory_menu"):
+		accesory_changed(accesoryInventory[radial_menu(accesoryMenu)])
+		accesoryMenu.visible = false
+
+
 
 func radial_menu(menu):
 	

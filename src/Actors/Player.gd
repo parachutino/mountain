@@ -144,10 +144,15 @@ func check_snap():
 
 func state_machine():
 	
+	var parachute = $player/parachute
+	
 	if _direction.x > 0: player.scale.x = 1
 	elif _direction.x < 0: player.scale.x = -1
 	
 	if is_on_floor():
+		
+		parachute.visible = false
+		
 		if _direction.x == 0:
 			state.travel("idle")
 			# SEEDS HAT ANIMATION WHEN IDLE ACCORDING TO WIND
@@ -165,46 +170,53 @@ func state_machine():
 	else:
 		if terrain == "air":
 			state.travel("fall")
+			
+			if accesory == "Parachute":	parachute.visible = true
 	
 	if _direction.y == -1:
 		state.travel("jump")
 
 func change_sprite(shoes, accesory):
 	
-	print_debug("Changing Accesory to: ", accesory)
+	print_debug("Shoes: ", shoes, " / Accesory: ", accesory)
 	
-	var gorrito = $player/gorrito.visible
-	var sleepingBag = $player/sleepingBag.visible
-	var jumpingTool = $player/jumpingTool.visible
-	var rainCoat = $player/rainCoat.visible
+	var gorrito = $player/gorrito
+	var sleepingBag = $player/sleepingBag
+	var jumpingTool = $player/jumpingTool
+	var rainCoat = $player/rainCoat
+	var parachuteBag = $player/parachuteBag
 	
 	player.set_texture(playerSpritesNormal[shoes])
 	
 	if accesory == "Nothing":
-		gorrito = true
-		sleepingBag = true
-		jumpingTool = false
-		rainCoat = false
+		gorrito.visible = true
+		sleepingBag.visible = true
+		jumpingTool.visible = false
+		rainCoat.visible = false
+		parachuteBag.visible = false
 		
 	elif accesory == "Rain Coat":
-		gorrito = false
-		sleepingBag = false
-		jumpingTool = false
-		rainCoat = true
+		gorrito.visible = false
+		sleepingBag.visible = false
+		jumpingTool.visible = false
+		rainCoat.visible = true
+		parachuteBag.visible = false
 	
 	elif accesory == "Jumping Tool":
-		gorrito = true
-		sleepingBag = false
-		jumpingTool = true
-		rainCoat = false
+		gorrito.visible = true
+		sleepingBag.visible = false
+		jumpingTool.visible = true
+		rainCoat.visible = false
+		parachuteBag.visible = false
 
-"""
+
 	elif accesory == "Parachute":
-		gorrito = false
-		sleepingBag = false
-		jupingTool = false
-		rainCoat = true
-"""
+		gorrito.visible = true
+		sleepingBag.visible = true
+		jumpingTool.visible = false
+		rainCoat.visible = false
+		parachuteBag.visible = true
+
 
 func recalculate_all():
 	calculate_stats()
